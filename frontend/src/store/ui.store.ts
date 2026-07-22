@@ -18,6 +18,7 @@ interface UIState {
   // Create Issue Modal
   createIssueOpen: boolean;
   createIssueProjectId: string | null;
+  createIssueStateId?: string | null;
 
   // Notifications panel
   notificationsPanelOpen: boolean;
@@ -30,7 +31,7 @@ interface UIState {
   setSidebarCollapsed: (collapsed: boolean) => void;
   openCommandPalette: () => void;
   closeCommandPalette: () => void;
-  openCreateIssue: (projectId?: string) => void;
+  openCreateIssue: (projectId?: string, stateId?: string) => void;
   closeCreateIssue: () => void;
   toggleNotifications: () => void;
   setActiveView: (view: ViewType) => void;
@@ -43,6 +44,7 @@ export const useUIStore = create<UIState>()(
     commandPaletteOpen: false,
     createIssueOpen: false,
     createIssueProjectId: null,
+    createIssueStateId: null,
     notificationsPanelOpen: false,
     activeView: "list",
 
@@ -66,10 +68,11 @@ export const useUIStore = create<UIState>()(
         s.commandPaletteOpen = false;
       }),
 
-    openCreateIssue: (projectId) =>
+    openCreateIssue: (projectId, stateId) =>
       set((s) => {
         s.createIssueOpen = true;
         s.createIssueProjectId = projectId ?? null;
+        s.createIssueStateId = stateId ?? null;
       }),
 
     closeCreateIssue: () =>

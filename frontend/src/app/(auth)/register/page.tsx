@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, Loader2, ArrowRight, Check } from "lucide-react";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { useAuthStore } from "@/store/auth.store";
 import type { User, AuthTokens } from "@/types";
+import { OAuthButtons } from "../OAuthButtons";
 
 const registerSchema = z
   .object({
@@ -29,37 +30,20 @@ const registerSchema = z
       .regex(/[a-z]/, "One lowercase letter")
       .regex(/\d/, "One number")
       .regex(/[!@#$%^&*(),.?":{}|<>]/, "One special character"),
-    confirm_password: z.string(),
-  })
-  .refine((d) => d.password === d.confirm_password, {
-    message: "Passwords do not match",
-    path: ["confirm_password"],
   });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
-
-const passwordRules = [
-  { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
-  { label: "Uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
-  { label: "Lowercase letter", test: (p: string) => /[a-z]/.test(p) },
-  { label: "Number", test: (p: string) => /\d/.test(p) },
-  { label: "Special character", test: (p: string) => /[!@#$%^&*(),.?":{}|<>]/.test(p) },
-];
 
 export default function RegisterPage() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
   const [showPassword, setShowPassword] = useState(false);
-  const [passwordValue, setPasswordValue] = useState("");
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({ resolver: zodResolver(registerSchema) });
-
-  const watchedPassword = watch("password", "");
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -80,216 +64,111 @@ export default function RegisterPage() {
     }
   };
 
-  const inputStyle = {
-    background: "rgb(var(--color-background))",
-    border: "1px solid rgb(var(--color-border))",
-    borderRadius: "8px",
-    color: "rgb(var(--color-foreground))",
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="w-full"
     >
-      <div className="mb-7">
-        <h1
-          className="text-2xl font-bold"
-          style={{ letterSpacing: "-0.024em", color: "rgb(var(--color-foreground))" }}
-        >
-          Create your account
-        </h1>
-        <p className="mt-1.5 text-sm" style={{ color: "rgb(var(--color-foreground-muted))" }}>
-          Already have one?{" "}
-          <Link
-            href="/login"
-            className="font-medium"
-            style={{ color: "rgb(var(--color-primary))" }}
-          >
-            Sign in
-          </Link>
-        </p>
-      </div>
+      <h1 className="text-[42px] font-normal tracking-tight text-black mb-10 font-serif">
+        Sign up
+      </h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-3.5">
-        {/* Name */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium" htmlFor="reg-name">Full name</label>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+        <div className="space-y-2">
+          <label className="block text-[13px] font-bold text-black" htmlFor="display_name">
+            Full name
+          </label>
           <input
-            id="reg-name"
+            id="display_name"
             type="text"
             autoComplete="name"
             placeholder="John Smith"
-            className="input"
+            className="w-full px-4 py-3 rounded-[12px] border border-gray-300 bg-white text-black text-[14px] placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
             {...register("display_name")}
           />
-          {errors.display_name && (
-            <p className="text-xs" style={{ color: "rgb(var(--color-danger))" }}>
-              {errors.display_name.message}
-            </p>
-          )}
+          {errors.display_name && <p className="text-xs text-red-500">{errors.display_name.message}</p>}
         </div>
 
-        {/* Username */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium" htmlFor="reg-username">Username</label>
+        <div className="space-y-2">
+          <label className="block text-[13px] font-bold text-black" htmlFor="username">
+            Username
+          </label>
           <div className="relative">
-            <span
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-sm select-none"
-              style={{ color: "rgb(var(--color-foreground-muted))" }}
-            >
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 select-none">
               @
             </span>
             <input
-              id="reg-username"
+              id="username"
               type="text"
               autoComplete="username"
               placeholder="johnsmith"
-              className="input pl-7"
+              className="w-full pl-8 pr-4 py-3 rounded-[12px] border border-gray-300 bg-white text-black text-[14px] placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
               {...register("username")}
             />
           </div>
-          {errors.username && (
-            <p className="text-xs" style={{ color: "rgb(var(--color-danger))" }}>
-              {errors.username.message}
-            </p>
-          )}
+          {errors.username && <p className="text-xs text-red-500">{errors.username.message}</p>}
         </div>
 
-        {/* Email */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium" htmlFor="reg-email">Email address</label>
+        <div className="space-y-2">
+          <label className="block text-[13px] font-bold text-black" htmlFor="email">
+            Email address
+          </label>
           <input
-            id="reg-email"
+            id="email"
             type="email"
             autoComplete="email"
-            placeholder="you@company.com"
-            className="input"
+            placeholder="Enter your email"
+            className="w-full px-4 py-3 rounded-[12px] border border-gray-300 bg-white text-black text-[14px] placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
             {...register("email")}
           />
-          {errors.email && (
-            <p className="text-xs" style={{ color: "rgb(var(--color-danger))" }}>
-              {errors.email.message}
-            </p>
-          )}
+          {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
         </div>
 
-        {/* Password */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium" htmlFor="reg-password">Password</label>
+        <div className="space-y-2">
+          <label className="block text-[13px] font-bold text-black" htmlFor="password">
+            Password
+          </label>
           <div className="relative">
             <input
-              id="reg-password"
+              id="password"
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               placeholder="Create a strong password"
-              className="input pr-10"
-              {...register("password", {
-                onChange: (e) => setPasswordValue(e.target.value),
-              })}
+              className="w-full px-4 py-3 rounded-[12px] border border-gray-300 bg-white text-black text-[14px] placeholder-gray-400 focus:outline-none focus:border-black transition-colors pr-12"
+              {...register("password")}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
-              style={{ color: "rgb(var(--color-foreground-muted))" }}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-
-          {/* Password strength checklist */}
-          {(watchedPassword || passwordValue) && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              className="grid grid-cols-2 gap-1 mt-2"
-            >
-              {passwordRules.map((rule) => {
-                const passed = rule.test(watchedPassword || passwordValue);
-                return (
-                  <div key={rule.label} className="flex items-center gap-1.5">
-                    <div
-                      className="w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200"
-                      style={{
-                        background: passed
-                          ? "rgba(var(--color-success), 0.15)"
-                          : "rgb(var(--color-muted))",
-                        border: `1px solid ${passed ? "rgba(var(--color-success), 0.3)" : "rgb(var(--color-border))"}`,
-                      }}
-                    >
-                      {passed && (
-                        <Check className="w-2 h-2" style={{ color: "rgb(var(--color-success))" }} />
-                      )}
-                    </div>
-                    <span
-                      className="text-[11px] leading-tight transition-colors"
-                      style={{
-                        color: passed
-                          ? "rgb(var(--color-success))"
-                          : "rgb(var(--color-foreground-muted))",
-                      }}
-                    >
-                      {rule.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </motion.div>
-          )}
-
-          {errors.password && (
-            <p className="text-xs" style={{ color: "rgb(var(--color-danger))" }}>
-              {errors.password.message}
-            </p>
-          )}
+          {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
         </div>
 
-        {/* Confirm Password */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium" htmlFor="reg-confirm">Confirm password</label>
-          <input
-            id="reg-confirm"
-            type="password"
-            autoComplete="new-password"
-            placeholder="Re-enter your password"
-            className="input"
-            {...register("confirm_password")}
-          />
-          {errors.confirm_password && (
-            <p className="text-xs" style={{ color: "rgb(var(--color-danger))" }}>
-              {errors.confirm_password.message}
-            </p>
-          )}
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex items-center justify-center px-8 py-3 rounded-full bg-black text-white text-[14px] font-medium hover:bg-black/90 transition-colors disabled:opacity-50"
+          >
+            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign up"}
+          </button>
         </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="btn btn-primary w-full mt-1"
-        >
-          {isSubmitting ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <>
-              <span>Create account</span>
-              <ArrowRight className="w-4 h-4" />
-            </>
-          )}
-        </button>
       </form>
+      
+      <OAuthButtons />
 
-      <p
-        className="mt-5 text-center text-xs leading-relaxed"
-        style={{ color: "rgb(var(--color-foreground-muted))" }}
-      >
-        By creating an account, you agree to our{" "}
-        <Link href="/terms" className="underline underline-offset-2">Terms</Link>
-        {" "}and{" "}
-        <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>
-      </p>
+      <div className="mt-10 text-[14px] text-gray-500 font-medium">
+        Already have an account?{" "}
+        <Link href="/login" className="text-black hover:underline">
+          Sign in
+        </Link>
+      </div>
     </motion.div>
   );
 }

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui.store";
 import { useAuthStore } from "@/store/auth.store";
 import { getInitials, getUserColor } from "@/lib/utils";
+import { Logo } from "@/components/common/Logo";
 import { useQuery } from "@tanstack/react-query";
 import { projectsApi } from "@/lib/api";
 import type { Project } from "@/types";
@@ -57,13 +58,9 @@ export function AppSidebar() {
         style={{ borderColor: "rgb(var(--color-sidebar-border))" }}
       >
         <div
-          className="w-6.5 h-6.5 w-[26px] h-[26px] rounded-md flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0"
-          style={{
-            background: "linear-gradient(135deg, #2575ff, #6d3cf0)",
-            boxShadow: "0 1px 3px rgba(37,117,255,0.4)",
-          }}
+          className="w-6.5 h-6.5 w-[26px] h-[26px] flex items-center justify-center flex-shrink-0"
         >
-          H
+          <Logo />
         </div>
 
         <AnimatePresence initial={false}>
@@ -278,7 +275,7 @@ export function AppSidebar() {
 
         {/* User */}
         <Link
-          href="/settings/profile"
+          href="/settings/preferences"
           className="flex items-center gap-2 px-2 py-2 rounded-md transition-all duration-150"
           style={{ color: "rgb(var(--color-sidebar-foreground))" }}
           onMouseEnter={(e) => (e.currentTarget.style.background = "rgb(var(--color-sidebar-accent))")}

@@ -79,14 +79,14 @@ export default function ProfileSettingsPage() {
       });
 
       // 2. Upload to MinIO/S3 directly
-      await axios.put(data.data.upload_url, file, {
+      await axios.put((data as any).data?.upload_url || (data as any).upload_url, file, {
         headers: {
           "Content-Type": file.type,
         },
       });
 
       // 3. Update user profile with new avatar URL
-      await updateMutation.mutateAsync({ avatar_url: data.data.avatar_url });
+      await updateMutation.mutateAsync({ avatar_url: (data as any).data?.avatar_url || (data as any).avatar_url });
 
     } catch (error) {
       toast.error("Failed to upload avatar");

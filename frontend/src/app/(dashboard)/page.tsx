@@ -71,7 +71,7 @@ const stats = [
 // ── Quick actions ─────────────────────────────────────────
 
 function QuickAction({ icon: Icon, label, href, onClick, accent }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   label: string;
   href?: string;
   onClick?: () => void;

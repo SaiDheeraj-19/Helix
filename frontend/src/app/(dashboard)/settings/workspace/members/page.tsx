@@ -24,7 +24,7 @@ export default function WorkspaceMembersPage() {
     queryFn: () => organizationsApi.getMembers(ORG_SLUG),
   });
 
-  const members = data?.data || [];
+  const members: any[] = (data && (data as any).data) || [];
 
   const addMemberMutation = useMutation({
     mutationFn: (data: { email: string; role: string }) => organizationsApi.addMember(ORG_SLUG, data),

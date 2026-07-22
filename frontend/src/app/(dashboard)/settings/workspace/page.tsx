@@ -42,8 +42,8 @@ export default function WorkspaceSettingsPage() {
   } = useForm<WorkspaceForm>({
     resolver: zodResolver(workspaceSchema),
     values: {
-      name: org?.name || "",
-      description: org?.description || "",
+      name: (org as any)?.name || "",
+      description: (org as any)?.description || "",
     },
   });
 
@@ -94,7 +94,7 @@ export default function WorkspaceSettingsPage() {
               app.helix.io/
             </span>
             <input
-              value={org.slug}
+              value={(org as any)?.slug}
               disabled
               className="flex-1 px-3 py-2 text-sm bg-background text-muted-foreground cursor-not-allowed focus:outline-none"
             />
@@ -120,7 +120,7 @@ export default function WorkspaceSettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold">
-                Current Plan: <span className="text-primary capitalize">{org.plan}</span>
+                Current Plan: <span className="text-primary capitalize">{(org as any)?.plan || 'Free'}</span>
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Unlimited projects, 10 members. Upgrade for more.
@@ -183,12 +183,12 @@ export default function WorkspaceSettingsPage() {
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Type <strong className="text-foreground">{org.slug}</strong> to confirm deletion.
+                    Type <strong className="text-foreground">{(org as any)?.slug}</strong> to confirm deletion.
                   </p>
                   <input
                     value={deleteConfirm}
                     onChange={(e) => setDeleteConfirm(e.target.value)}
-                    placeholder={org.slug}
+                    placeholder={(org as any)?.slug}
                     className="w-full mb-4 px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-destructive"
                   />
                   <div className="flex justify-end gap-3">
@@ -196,7 +196,7 @@ export default function WorkspaceSettingsPage() {
                       <button className="px-4 py-2 text-sm rounded-lg border border-border hover:bg-muted transition-colors">Cancel</button>
                     </Dialog.Close>
                     <button
-                      disabled={deleteConfirm !== org.slug}
+                      disabled={deleteConfirm !== (org as any)?.slug}
                       onClick={() => {
                         toast.error("Contact support to delete a workspace.");
                         setDeleteOpen(false);
