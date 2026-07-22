@@ -11,12 +11,10 @@ from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
-from src.core.exceptions import ConflictError, NotFoundError, UnauthorizedError, ValidationError_
+from src.core.exceptions import ConflictError, NotFoundError, UnauthorizedError
 from src.core.security import (
     TokenType,
     create_access_token,
-    create_refresh_token,
-    create_verification_token,
     decode_token,
     hash_password,
     verify_password,
@@ -24,8 +22,8 @@ from src.core.security import (
 from src.modules.auth.repository import AuthRepository
 from src.modules.auth.schemas import (
     AuthUserResponse,
-    LoginResponse,
     LoginRequest,
+    LoginResponse,
     MessageResponse,
     RegisterRequest,
     TokenResponse,

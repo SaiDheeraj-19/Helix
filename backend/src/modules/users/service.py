@@ -1,10 +1,12 @@
 """Helix — Users Module: Service"""
 from uuid import UUID
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.core.exceptions import NotFoundError
 from src.modules.users.models import User
 from src.modules.users.schemas import UpdateUserRequest
-from src.core.exceptions import NotFoundError
 
 
 class UserService:

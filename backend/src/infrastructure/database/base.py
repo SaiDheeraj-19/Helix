@@ -2,8 +2,8 @@
 Helix Backend — SQLAlchemy Declarative Base
 """
 
-from sqlalchemy.orm import DeclarativeBase, MappedColumn, mapped_column
 from sqlalchemy import MetaData
+from sqlalchemy.orm import DeclarativeBase
 
 # Naming convention for Alembic migrations — ensures constraint names are deterministic
 NAMING_CONVENTION = {

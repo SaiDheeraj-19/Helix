@@ -3,17 +3,15 @@ Helix — Auth Module: Router
 FastAPI route handlers for authentication endpoints.
 """
 
-from typing import Annotated
 import urllib.parse
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Request, status
 from fastapi.responses import ORJSONResponse, RedirectResponse
 
+from src.core.config import settings
 from src.core.dependencies import CurrentUserID, DBSession
 from src.core.response import SuccessResponse, ok
-from src.core.config import settings
 from src.modules.auth.schemas import (
-    ChangePasswordRequest,
     ForgotPasswordRequest,
     LoginRequest,
     LoginResponse,
@@ -74,13 +72,13 @@ async def oauth_google_callback(
         err_msg = urllib.parse.quote(error or "no_code", safe="")
         return RedirectResponse(url=f"{frontend_callback}?error={err_msg}")
 
+
     from src.modules.auth.oauth_service import (
         exchange_google_code,
         find_or_create_oauth_user,
         issue_tokens_for_user,
     )
     from src.modules.auth.repository import AuthRepository
-    import json
 
     try:
         userinfo = await exchange_google_code(code)
@@ -144,13 +142,13 @@ async def oauth_github_callback(
         err_msg = urllib.parse.quote(error or "no_code", safe="")
         return RedirectResponse(url=f"{frontend_callback}?error={err_msg}")
 
+
     from src.modules.auth.oauth_service import (
         exchange_github_code,
         find_or_create_oauth_user,
         issue_tokens_for_user,
     )
     from src.modules.auth.repository import AuthRepository
-    import json
 
     try:
         profile = await exchange_github_code(code)

@@ -4,10 +4,16 @@ Helix — Projects Module: Models
 
 import uuid
 from enum import StrEnum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
-    Boolean, ForeignKey, Index, Integer, String, Text, UniqueConstraint,
+    Boolean,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -16,8 +22,8 @@ from src.infrastructure.database.base import Base
 from src.infrastructure.database.mixins import AuditMixin, HelixBase
 
 if TYPE_CHECKING:
-    from src.modules.workspaces.models import Workspace
     from src.modules.users.models import User
+    from src.modules.workspaces.models import Workspace
 
 
 class ProjectStatus(StrEnum):
@@ -64,8 +70,8 @@ class Project(HelixBase, AuditMixin, Base):
         nullable=False,
         comment="Short project key e.g. HLX — used for issue IDs like HLX-42",
     )
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    icon: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)  # emoji
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    icon: Mapped[str | None] = mapped_column(String(10), nullable=True)  # emoji
     color: Mapped[str] = mapped_column(String(20), default="#6366f1", nullable=False)
 
     status: Mapped[str] = mapped_column(
@@ -79,7 +85,7 @@ class Project(HelixBase, AuditMixin, Base):
     issue_sequence: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
     # Settings
-    default_assignee_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+    default_assignee_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
 
@@ -145,7 +151,7 @@ class IssueState(HelixBase, Base):
         default="unstarted",
         comment="backlog | unstarted | started | completed | cancelled",
     )
-    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     sequence: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
@@ -169,8 +175,8 @@ class Label(HelixBase, Base):
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     color: Mapped[str] = mapped_column(String(20), default="#6366f1", nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    parent_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+    description: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("labels.id", ondelete="SET NULL"), nullable=True
     )
 

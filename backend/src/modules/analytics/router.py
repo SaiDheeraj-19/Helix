@@ -1,12 +1,14 @@
 """Helix — Analytics Module: Router"""
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
+
 from fastapi import APIRouter, Query
-from sqlalchemy import select, func, case, and_
+from sqlalchemy import func, select
+
 from src.core.dependencies import CurrentUserID, DBSession
 from src.core.response import SuccessResponse, ok
 from src.modules.issues.models import Issue
 from src.modules.projects.models import IssueState
-from datetime import datetime, timedelta, timezone
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
@@ -51,7 +53,7 @@ async def project_overview(project_id: UUID, current_user_id: CurrentUserID, db:
         "completed_count": by_group.get("completed", 0),
         "overdue_count": sum(
             1 for i in issues
-            if i.due_date and i.due_date < datetime.now(tz=timezone.utc).date()
+            if i.due_date and i.due_date < datetime.now(tz=UTC).date()
             and str(states.get(str(i.state_id), IssueState()).group or "") not in ("completed", "cancelled")
         ),
     })
@@ -65,7 +67,7 @@ async def velocity(
     weeks: int = Query(8, ge=2, le=26),
 ):
     """Issues completed per week for the last N weeks."""
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     data = []
 
     for week_offset in range(weeks - 1, -1, -1):

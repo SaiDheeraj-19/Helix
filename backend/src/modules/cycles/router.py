@@ -1,13 +1,14 @@
 """Helix — Cycles Module: Router"""
 from uuid import UUID
+
 from fastapi import APIRouter, status
+from sqlalchemy import select
+
 from src.core.dependencies import CurrentUserID, DBSession
 from src.core.response import SuccessResponse, ok
-from src.modules.cycles.schemas import CycleCreate, CycleUpdate, CycleResponse, CycleIssueAdd
+from src.modules.cycles.schemas import CycleCreate, CycleIssueAdd, CycleResponse, CycleUpdate
 from src.modules.cycles.service import CycleService
-from src.modules.projects.service import ProjectService
 from src.modules.workspaces.models import Workspace
-from sqlalchemy import select
 
 router = APIRouter(tags=["Cycles"])
 

@@ -1,15 +1,19 @@
 """Helix — Projects Module: Router"""
 from uuid import UUID
-from fastapi import APIRouter, Depends, status
-from fastapi.responses import ORJSONResponse
+
+from fastapi import APIRouter, status
 
 from src.core.dependencies import CurrentUserID, DBSession
-from src.core.response import SuccessResponse, PaginatedResponse, ok, paginated
+from src.core.response import SuccessResponse, ok
 from src.modules.projects.schemas import (
-    ProjectCreate, ProjectUpdate, ProjectResponse,
-    IssueStateCreate, IssueStateResponse,
-    LabelCreate, LabelResponse,
+    IssueStateCreate,
+    IssueStateResponse,
+    LabelCreate,
+    LabelResponse,
+    ProjectCreate,
     ProjectMemberResponse,
+    ProjectResponse,
+    ProjectUpdate,
 )
 from src.modules.projects.service import ProjectService
 
@@ -41,8 +45,9 @@ async def create_project(
     summary="List projects in a workspace",
 )
 async def list_projects(ws_slug: str, current_user_id: CurrentUserID, db: DBSession):
-    from src.modules.workspaces.models import Workspace
     from sqlalchemy import select
+
+    from src.modules.workspaces.models import Workspace
     ws_result = await db.execute(
         select(Workspace).where(Workspace.slug == ws_slug, Workspace.deleted_at.is_(None))
     )
@@ -61,8 +66,9 @@ async def list_projects(ws_slug: str, current_user_id: CurrentUserID, db: DBSess
     summary="Get project by identifier",
 )
 async def get_project(ws_slug: str, identifier: str, current_user_id: CurrentUserID, db: DBSession):
-    from src.modules.workspaces.models import Workspace
     from sqlalchemy import select
+
+    from src.modules.workspaces.models import Workspace
     ws_result = await db.execute(
         select(Workspace).where(Workspace.slug == ws_slug, Workspace.deleted_at.is_(None))
     )

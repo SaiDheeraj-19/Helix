@@ -1,12 +1,15 @@
 """Helix — Cycles Module: Models"""
 from __future__ import annotations
+
+import datetime
 from enum import Enum as PyEnum
-from sqlalchemy import String, Text, ForeignKey, Date, UniqueConstraint
+from uuid import UUID as UUIDType
+
+from sqlalchemy import Date, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from src.infrastructure.database.base import Base
 from src.infrastructure.database.mixins import TimestampMixin, UUIDPrimaryKeyMixin
-from uuid import UUID as UUIDType
-import datetime
 
 
 class CycleStatus(str, PyEnum):
@@ -41,11 +44,11 @@ class Cycle(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     end_date: Mapped[datetime.date | None] = mapped_column(Date, nullable=True)
 
     # Relations
-    project: Mapped["Project"] = relationship(back_populates="cycles", lazy="noload")
-    issues: Mapped[list["CycleIssue"]] = relationship(
+    project: Mapped[Project] = relationship(back_populates="cycles", lazy="noload")
+    issues: Mapped[list[CycleIssue]] = relationship(
         back_populates="cycle", cascade="all, delete-orphan", lazy="selectin"
     )
-    creator: Mapped["User"] = relationship(foreign_keys=[created_by], lazy="noload")
+    creator: Mapped[User] = relationship(foreign_keys=[created_by], lazy="noload")
 
 
 class CycleIssue(Base, UUIDPrimaryKeyMixin, TimestampMixin):
@@ -63,5 +66,5 @@ class CycleIssue(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
 
     # Relations
-    cycle: Mapped["Cycle"] = relationship(back_populates="issues", lazy="noload")
-    issue: Mapped["Issue"] = relationship(lazy="selectin")
+    cycle: Mapped[Cycle] = relationship(back_populates="issues", lazy="noload")
+    issue: Mapped[Issue] = relationship(lazy="selectin")

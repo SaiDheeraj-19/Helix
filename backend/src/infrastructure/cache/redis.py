@@ -3,7 +3,6 @@ Helix Backend — Redis Client
 Async Redis connection pool with helper utilities.
 """
 
-from typing import Any
 
 import redis.asyncio as aioredis
 import structlog

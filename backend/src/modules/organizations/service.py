@@ -1,10 +1,12 @@
 """Helix — Organizations Module: Service"""
 from uuid import UUID
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.core.exceptions import ConflictError, NotFoundError
 from src.modules.organizations.models import Organization, OrgMembership, OrgRole
 from src.modules.organizations.schemas import CreateOrgRequest
-from src.core.exceptions import ConflictError, NotFoundError
 
 
 class OrgService:
@@ -60,13 +62,13 @@ class OrgService:
     async def add_member(self, org_slug: str, email: str, role: str):
         from src.modules.users.models import User
         org = await self.get_by_slug(org_slug)
-        
+
         # Find user
         user_result = await self._db.execute(select(User).where(User.email == email))
         user = user_result.scalar_one_or_none()
         if not user:
             raise NotFoundError("User", email)
-            
+
         # Check existing membership
         existing = await self._db.execute(
             select(OrgMembership).where(
@@ -76,7 +78,7 @@ class OrgService:
         )
         if existing.scalar_one_or_none():
             raise ConflictError("User is already a member of this organization")
-            
+
         membership = OrgMembership(
             organization_id=org.id,
             user_id=user.id,
@@ -84,7 +86,7 @@ class OrgService:
         )
         self._db.add(membership)
         await self._db.flush()
-        
+
         # Load user for response
         await self._db.refresh(membership, ["user"])
         return membership
@@ -100,7 +102,7 @@ class OrgService:
         membership = result.scalar_one_or_none()
         if not membership:
             raise NotFoundError("Membership", str(membership_id))
-            
+
         membership.role = OrgRole(new_role)
         await self._db.flush()
         await self._db.refresh(membership, ["user"])
@@ -117,7 +119,7 @@ class OrgService:
         membership = result.scalar_one_or_none()
         if not membership:
             raise NotFoundError("Membership", str(membership_id))
-            
+
         await self._db.delete(membership)
         await self._db.flush()
 

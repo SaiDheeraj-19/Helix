@@ -1,15 +1,16 @@
 """Helix — Cycles Module: Service"""
 from __future__ import annotations
+
 from uuid import UUID
+
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, delete
 from sqlalchemy.orm import selectinload
 
+from src.core.exceptions import NotFoundError
 from src.modules.cycles.models import Cycle, CycleIssue, CycleStatus
 from src.modules.cycles.schemas import CycleCreate, CycleUpdate
 from src.modules.issues.models import Issue
-from src.modules.projects.models import IssueState
-from src.core.exceptions import NotFoundError
 
 
 class CycleService:

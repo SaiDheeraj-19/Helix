@@ -8,17 +8,22 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import (
-    Boolean, DateTime, Float, ForeignKey, Index, Integer,
-    String, Text, UniqueConstraint,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.database.base import Base
 from src.infrastructure.database.mixins import AuditMixin, HelixBase
 
 if TYPE_CHECKING:
-    from src.modules.projects.models import Project, IssueState, Label
+    from src.modules.projects.models import IssueState, Label, Project
     from src.modules.users.models import User
 
 
@@ -68,8 +73,8 @@ class Issue(HelixBase, AuditMixin, Base):
 
     # Core fields
     title: Mapped[str] = mapped_column(String(500), nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    description_html: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    description_html: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Classification
     priority: Mapped[str] = mapped_column(
@@ -80,15 +85,15 @@ class Issue(HelixBase, AuditMixin, Base):
     )
 
     # Estimation
-    estimate: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    estimate: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     # Dates
-    due_date: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)   # ISO date only
-    started_at: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
-    completed_at: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    due_date: Mapped[str | None] = mapped_column(String(10), nullable=True)   # ISO date only
+    started_at: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    completed_at: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
     # Hierarchy (subtasks)
-    parent_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("issues.id", ondelete="CASCADE"), nullable=True, index=True
     )
 
@@ -180,7 +185,7 @@ class Comment(HelixBase, AuditMixin, Base):
     )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     content_html: Mapped[str] = mapped_column(Text, nullable=False)
-    edited_at: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
+    edited_at: Mapped[str | None] = mapped_column(String(30), nullable=True)
 
     issue: Mapped["Issue"] = relationship("Issue", back_populates="comments")
 
@@ -204,12 +209,12 @@ class Activity(HelixBase, Base):
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     field: Mapped[str] = mapped_column(String(50), nullable=False, comment="Which field changed")
-    old_value: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    new_value: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    old_value: Mapped[str | None] = mapped_column(Text, nullable=True)
+    new_value: Mapped[str | None] = mapped_column(Text, nullable=True)
     activity_type: Mapped[str] = mapped_column(
         String(30), default="updated", nullable=False, comment="created | updated | commented | deleted"
     )
-    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    comment: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     issue: Mapped["Issue"] = relationship("Issue", back_populates="activities")
     actor: Mapped[Optional["User"]] = relationship("User")

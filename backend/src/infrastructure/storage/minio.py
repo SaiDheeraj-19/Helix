@@ -3,9 +3,7 @@ Helix Backend — MinIO Storage Client
 S3-compatible object storage for attachments, avatars, and documents.
 """
 
-import io
 from typing import BinaryIO
-from urllib.parse import urlparse
 
 import boto3
 import structlog

@@ -1,13 +1,14 @@
 """Helix — Notifications Module: Router"""
+from datetime import UTC, datetime
 from uuid import UUID
+
 from fastapi import APIRouter, status
+from pydantic import BaseModel
 from sqlalchemy import select, update
+
 from src.core.dependencies import CurrentUserID, DBSession
 from src.core.response import SuccessResponse, ok
 from src.modules.notifications.models import InAppNotification
-from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime, timezone
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
@@ -17,8 +18,8 @@ class NotificationResponse(BaseModel):
     title: str
     message: str
     notification_type: str
-    entity_type: Optional[str] = None
-    entity_id: Optional[str] = None
+    entity_type: str | None = None
+    entity_id: str | None = None
     is_read: bool
     created_at: str
 
@@ -64,7 +65,7 @@ async def mark_read(notification_id: UUID, current_user_id: CurrentUserID, db: D
             InAppNotification.id == notification_id,
             InAppNotification.user_id == current_user_id,
         )
-        .values(is_read=True, read_at=datetime.now(tz=timezone.utc).isoformat())
+        .values(is_read=True, read_at=datetime.now(tz=UTC).isoformat())
     )
     await db.flush()
 
@@ -72,7 +73,7 @@ async def mark_read(notification_id: UUID, current_user_id: CurrentUserID, db: D
 @router.post("/read-all", status_code=status.HTTP_204_NO_CONTENT)
 async def mark_all_read(current_user_id: CurrentUserID, db: DBSession):
     """Mark all notifications as read."""
-    now = datetime.now(tz=timezone.utc).isoformat()
+    now = datetime.now(tz=UTC).isoformat()
     await db.execute(
         update(InAppNotification)
         .where(

@@ -3,14 +3,13 @@ Sliding window rate limiter backed by Redis.
 Limits: per-user (authenticated) or per-IP (anonymous).
 """
 from __future__ import annotations
-import time
+
 import hashlib
-from typing import Optional
+import time
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
-
 
 # Routes with custom limits (requests per minute)
 ROUTE_LIMITS: dict[str, int] = {

@@ -1,7 +1,5 @@
 """Helix — Issues Module: Schemas"""
-from typing import Any, Optional
 from pydantic import BaseModel, Field
-
 
 # ─── Nested ────────────────────────────────────────────────────────────────────
 
@@ -17,7 +15,7 @@ class UserSlim(BaseModel):
     id: str
     display_name: str
     email: str
-    avatar_url: Optional[str] = None
+    avatar_url: str | None = None
     model_config = {"from_attributes": True}
 
 
@@ -32,32 +30,32 @@ class LabelSlim(BaseModel):
 
 class IssueCreate(BaseModel):
     title: str = Field(min_length=1, max_length=500)
-    description: Optional[str] = None
-    description_html: Optional[str] = None
+    description: str | None = None
+    description_html: str | None = None
     priority: str = Field("none")
-    state_id: Optional[str] = None   # uses project default if None
+    state_id: str | None = None   # uses project default if None
     assignee_ids: list[str] = Field(default_factory=list)
     label_ids: list[str] = Field(default_factory=list)
-    parent_id: Optional[str] = None
-    estimate: Optional[float] = Field(None, ge=0)
-    due_date: Optional[str] = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
-    started_at: Optional[str] = None
+    parent_id: str | None = None
+    estimate: float | None = Field(None, ge=0)
+    due_date: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    started_at: str | None = None
 
 
 class IssueUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=500)
-    description: Optional[str] = None
-    description_html: Optional[str] = None
-    priority: Optional[str] = None
-    state_id: Optional[str] = None
-    assignee_ids: Optional[list[str]] = None
-    label_ids: Optional[list[str]] = None
-    parent_id: Optional[str] = None
-    estimate: Optional[float] = None
-    due_date: Optional[str] = None
-    started_at: Optional[str] = None
-    completed_at: Optional[str] = None
-    sort_order: Optional[float] = None
+    title: str | None = Field(None, min_length=1, max_length=500)
+    description: str | None = None
+    description_html: str | None = None
+    priority: str | None = None
+    state_id: str | None = None
+    assignee_ids: list[str] | None = None
+    label_ids: list[str] | None = None
+    parent_id: str | None = None
+    estimate: float | None = None
+    due_date: str | None = None
+    started_at: str | None = None
+    completed_at: str | None = None
+    sort_order: float | None = None
 
 
 class IssueResponse(BaseModel):
@@ -66,22 +64,22 @@ class IssueResponse(BaseModel):
     project_id: str
     sequence_id: int
     title: str
-    description: Optional[str] = None
-    description_html: Optional[str] = None
+    description: str | None = None
+    description_html: str | None = None
     priority: str
     state: StateSlim
     assignees: list[UserSlim] = Field(default_factory=list)
     labels: list[LabelSlim] = Field(default_factory=list)
-    parent_id: Optional[str] = None
-    estimate: Optional[float] = None
-    due_date: Optional[str] = None
-    started_at: Optional[str] = None
-    completed_at: Optional[str] = None
+    parent_id: str | None = None
+    estimate: float | None = None
+    due_date: str | None = None
+    started_at: str | None = None
+    completed_at: str | None = None
     sort_order: float
     sub_issues_count: int = 0
     attachment_count: int = 0
     comment_count: int = 0
-    created_by: Optional[str] = None
+    created_by: str | None = None
     created_at: str
     updated_at: str
 
@@ -93,8 +91,8 @@ class IssueFilters(BaseModel):
     priority: list[str] = Field(default_factory=list)
     assignee_ids: list[str] = Field(default_factory=list)
     label_ids: list[str] = Field(default_factory=list)
-    search: Optional[str] = None
-    parent_id: Optional[str] = None   # filter by subtasks
+    search: str | None = None
+    parent_id: str | None = None   # filter by subtasks
     order_by: str = Field("-created_at")   # prefix - for DESC
 
 
@@ -122,7 +120,7 @@ class CommentResponse(BaseModel):
     content: str
     content_html: str
     actor: UserSlim
-    edited_at: Optional[str] = None
+    edited_at: str | None = None
     created_at: str
     updated_at: str
 
@@ -135,11 +133,11 @@ class ActivityResponse(BaseModel):
     id: str
     issue_id: str
     field: str
-    old_value: Optional[str] = None
-    new_value: Optional[str] = None
+    old_value: str | None = None
+    new_value: str | None = None
     activity_type: str
-    comment: Optional[str] = None
-    actor: Optional[UserSlim] = None
+    comment: str | None = None
+    actor: UserSlim | None = None
     created_at: str
 
     model_config = {"from_attributes": True}
@@ -166,7 +164,7 @@ class AttachmentResponse(BaseModel):
     file_size: int
     content_type: str
     download_url: str
-    uploaded_by: Optional[UserSlim] = None
+    uploaded_by: UserSlim | None = None
     created_at: str
 
     model_config = {"from_attributes": True}

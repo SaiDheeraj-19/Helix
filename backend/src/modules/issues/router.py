@@ -1,16 +1,23 @@
 """Helix — Issues Module: Router"""
 from uuid import UUID
-from fastapi import APIRouter, Depends, Query, status
-from fastapi.responses import ORJSONResponse
 
-from src.core.dependencies import CurrentUserID, DBSession, PaginationParams
-from src.core.response import SuccessResponse, PaginatedResponse, ok, paginated
+from fastapi import APIRouter, Query, status
+
+from src.core.dependencies import CurrentUserID, DBSession
+from src.core.response import PaginatedResponse, SuccessResponse, ok, paginated
 from src.modules.issues.schemas import (
-    IssueCreate, IssueUpdate, IssueResponse,
-    IssueFilters, IssueMoveRequest,
-    CommentCreate, CommentUpdate, CommentResponse,
     ActivityResponse,
-    AttachmentUploadRequest, AttachmentUploadResponse, AttachmentResponse,
+    AttachmentResponse,
+    AttachmentUploadRequest,
+    AttachmentUploadResponse,
+    CommentCreate,
+    CommentResponse,
+    CommentUpdate,
+    IssueCreate,
+    IssueFilters,
+    IssueMoveRequest,
+    IssueResponse,
+    IssueUpdate,
 )
 from src.modules.issues.service import IssueService
 
@@ -198,7 +205,6 @@ async def list_attachments(issue_id: UUID, current_user_id: CurrentUserID, db: D
     service = IssueService(db)
     attachments = await service.get_attachments(issue_id)
     from src.infrastructure.storage.minio import StorageService
-    from src.core.config import settings
     storage = StorageService()
     result = []
     for a in attachments:
@@ -219,7 +225,7 @@ async def list_attachments(issue_id: UUID, current_user_id: CurrentUserID, db: D
 # ─── Serialization helpers ─────────────────────────────────────────────────────
 
 def _serialize_issue(issue) -> IssueResponse:
-    from src.modules.issues.schemas import StateSlim, UserSlim, LabelSlim
+    from src.modules.issues.schemas import LabelSlim, StateSlim, UserSlim
 
     assignees = []
     for link in getattr(issue, "assignees", []):
@@ -272,8 +278,8 @@ def _serialize_issue(issue) -> IssueResponse:
 
 
 def _serialize_comment(comment) -> CommentResponse:
+
     from src.modules.issues.schemas import UserSlim
-    from sqlalchemy.orm import object_session
 
     actor = None
     if hasattr(comment, "created_by") and comment.created_by:

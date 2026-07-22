@@ -8,13 +8,12 @@ from typing import Annotated
 from uuid import UUID
 
 import structlog
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.config import settings
-from src.core.exceptions import ForbiddenError, UnauthorizedError
+from src.core.exceptions import UnauthorizedError
 from src.core.security import TokenType, decode_token
 from src.infrastructure.cache.redis import get_redis_client
 from src.infrastructure.database.session import async_session_factory

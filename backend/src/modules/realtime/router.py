@@ -1,7 +1,8 @@
 """Helix — WebSocket Router"""
 import structlog
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, Query
-from src.core.security import decode_token, TokenType
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+
+from src.core.security import TokenType, decode_token
 from src.infrastructure.realtime.manager import manager
 
 logger = structlog.get_logger(__name__)

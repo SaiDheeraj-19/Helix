@@ -1,12 +1,14 @@
 """Helix — Workspaces Module: Service"""
 from uuid import UUID
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+
 from slugify import slugify
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.core.exceptions import ConflictError, NotFoundError
+from src.modules.organizations.service import OrgService
 from src.modules.workspaces.models import Workspace
 from src.modules.workspaces.schemas import CreateWorkspaceRequest
-from src.modules.organizations.service import OrgService
-from src.core.exceptions import ConflictError, NotFoundError
 
 
 class WorkspaceService:

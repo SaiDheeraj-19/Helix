@@ -1,8 +1,9 @@
 """Helix — Workspaces Module: Router"""
 from fastapi import APIRouter
+
 from src.core.dependencies import CurrentUserID, DBSession
 from src.core.response import SuccessResponse, ok
-from src.modules.workspaces.schemas import WorkspaceResponse, CreateWorkspaceRequest
+from src.modules.workspaces.schemas import CreateWorkspaceRequest, WorkspaceResponse
 from src.modules.workspaces.service import WorkspaceService
 
 router = APIRouter(prefix="/orgs/{org_slug}/workspaces", tags=["Workspaces"])

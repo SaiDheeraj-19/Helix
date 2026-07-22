@@ -11,7 +11,6 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import ORJSONResponse
 from jose import JWTError
-from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 
 logger = structlog.get_logger(__name__)

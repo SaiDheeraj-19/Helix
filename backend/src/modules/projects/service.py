@@ -3,20 +3,23 @@ Helix — Projects Module: Service
 """
 
 import uuid
-from typing import Optional
+from datetime import UTC
+
 from slugify import slugify
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, update
 from sqlalchemy.orm import selectinload
 
-from src.core.exceptions import ConflictError, NotFoundError, ForbiddenError
+from src.core.exceptions import ConflictError, NotFoundError
 from src.modules.projects.models import (
-    Project, ProjectMember, ProjectRole, IssueState, Label,
-    ProjectStatus, ProjectNetwork,
+    IssueState,
+    Label,
+    Project,
+    ProjectMember,
+    ProjectRole,
 )
-from src.modules.projects.schemas import ProjectCreate, ProjectUpdate, IssueStateCreate, LabelCreate
+from src.modules.projects.schemas import IssueStateCreate, LabelCreate, ProjectCreate, ProjectUpdate
 from src.modules.workspaces.service import WorkspaceService
-
 
 # Default workflow states for every new project
 DEFAULT_STATES = [
@@ -143,11 +146,11 @@ class ProjectService:
         return await self.get_by_id(project_id)
 
     async def delete(self, project_id: uuid.UUID, deleted_by: uuid.UUID) -> None:
-        from datetime import datetime, timezone
+        from datetime import datetime
         await self._db.execute(
             update(Project)
             .where(Project.id == project_id)
-            .values(deleted_at=datetime.now(timezone.utc), updated_by=deleted_by)
+            .values(deleted_at=datetime.now(UTC), updated_by=deleted_by)
         )
 
     # ─── States ────────────────────────────────────────────────────────────────

@@ -4,7 +4,7 @@ Helix — Organizations Module: Models
 
 import uuid
 from enum import StrEnum
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, ForeignKey, Index, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
@@ -44,9 +44,9 @@ class Organization(HelixBase, Base):
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, index=True)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    logo_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
-    website: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    logo_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    website: Mapped[str | None] = mapped_column(String(2048), nullable=True)
 
     # Billing
     plan: Mapped[str] = mapped_column(
@@ -96,10 +96,10 @@ class OrgMembership(HelixBase, Base):
         index=True,
     )
     role: Mapped[str] = mapped_column(String(30), default=OrgRole.MEMBER, nullable=False)
-    invited_by: Mapped[Optional[uuid.UUID]] = mapped_column(
+    invited_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
-    joined_at: Mapped[Optional[uuid.UUID]] = mapped_column(nullable=True)  # TODO: DateTime
+    joined_at: Mapped[uuid.UUID | None] = mapped_column(nullable=True)  # TODO: DateTime
 
     # Relationships
     organization: Mapped["Organization"] = relationship("Organization", back_populates="memberships")

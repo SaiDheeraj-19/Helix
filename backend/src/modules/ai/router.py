@@ -3,18 +3,20 @@ Integrates Ollama (primary) + Groq (fallback) for AI-native features.
 Streams responses via Server-Sent Events (SSE).
 """
 from __future__ import annotations
+
 import json
+from collections.abc import AsyncIterator
 from uuid import UUID
-from typing import AsyncIterator
-from fastapi import APIRouter, HTTPException, status
+
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from src.core.config import settings
 from src.core.dependencies import CurrentUserID, DBSession
 from src.core.response import SuccessResponse, ok
-from src.core.config import settings
 
 router = APIRouter(prefix="/ai", tags=["AI"])
 
@@ -170,7 +172,7 @@ async def chat(request: ChatRequest, current_user_id: CurrentUserID):
 @router.post("/issues/{issue_id}/summarize", response_model=SuccessResponse[dict])
 async def summarize_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession):
     """Generate a concise summary of an issue including its comments."""
-    from src.modules.issues.models import Issue, Comment
+    from src.modules.issues.models import Issue
 
     result = await db.execute(
         select(Issue)

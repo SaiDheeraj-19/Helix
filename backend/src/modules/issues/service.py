@@ -3,25 +3,33 @@ Helix — Issues Module: Service
 """
 
 import uuid
-import json
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, update, delete
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
-from src.core.exceptions import NotFoundError, ForbiddenError, HelixException
+from src.core.config import settings
+from src.core.exceptions import NotFoundError
+from src.infrastructure.storage.minio import StorageService
 from src.modules.issues.models import (
-    Issue, IssueAssignee, IssueLabelLink, Comment, Activity, Attachment,
+    Activity,
+    Attachment,
+    Comment,
+    Issue,
+    IssueAssignee,
+    IssueLabelLink,
 )
 from src.modules.issues.schemas import (
-    IssueCreate, IssueUpdate, IssueFilters, CommentCreate, CommentUpdate,
-    AttachmentUploadRequest, AttachmentUploadResponse,
+    AttachmentUploadRequest,
+    AttachmentUploadResponse,
+    CommentCreate,
+    CommentUpdate,
+    IssueCreate,
+    IssueFilters,
+    IssueUpdate,
 )
 from src.modules.projects.service import ProjectService
-from src.infrastructure.storage.minio import StorageService
-from src.core.config import settings
 
 
 class IssueService:
@@ -245,7 +253,7 @@ class IssueService:
             update(Issue)
             .where(Issue.id == issue_id)
             .values(
-                deleted_at=datetime.now(timezone.utc),
+                deleted_at=datetime.now(UTC),
                 updated_by=deleted_by,
             )
         )
@@ -287,7 +295,7 @@ class IssueService:
             .values(
                 content=data.content,
                 content_html=data.content_html,
-                edited_at=datetime.now(timezone.utc).isoformat(),
+                edited_at=datetime.now(UTC).isoformat(),
                 updated_by=actor_id,
             )
         )

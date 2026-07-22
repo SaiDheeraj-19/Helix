@@ -1,17 +1,14 @@
 """Helix — Projects Module: Schemas"""
-from typing import Optional
-from uuid import UUID
-from pydantic import BaseModel, Field, field_validator
-from slugify import slugify as _slugify
 
+from pydantic import BaseModel, Field, field_validator
 
 # ─── Project ───────────────────────────────────────────────────────────────────
 
 class ProjectCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     identifier: str = Field(min_length=1, max_length=10)
-    description: Optional[str] = Field(None, max_length=5000)
-    icon: Optional[str] = Field(None, max_length=10)
+    description: str | None = Field(None, max_length=5000)
+    icon: str | None = Field(None, max_length=10)
     color: str = Field("#6366f1", pattern=r"^#[0-9a-fA-F]{6}$")
     network: str = Field("secret")
 
@@ -22,12 +19,12 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = Field(None, max_length=5000)
-    icon: Optional[str] = Field(None, max_length=10)
-    color: Optional[str] = Field(None, pattern=r"^#[0-9a-fA-F]{6}$")
-    network: Optional[str] = None
-    status: Optional[str] = None
+    name: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = Field(None, max_length=5000)
+    icon: str | None = Field(None, max_length=10)
+    color: str | None = Field(None, pattern=r"^#[0-9a-fA-F]{6}$")
+    network: str | None = None
+    status: str | None = None
 
 
 class ProjectResponse(BaseModel):
@@ -36,8 +33,8 @@ class ProjectResponse(BaseModel):
     name: str
     slug: str
     identifier: str
-    description: Optional[str] = None
-    icon: Optional[str] = None
+    description: str | None = None
+    icon: str | None = None
     color: str
     status: str
     network: str
@@ -53,7 +50,7 @@ class IssueStateCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     color: str = Field(pattern=r"^#[0-9a-fA-F]{6}$")
     group: str = Field(default="unstarted")
-    description: Optional[str] = Field(None, max_length=255)
+    description: str | None = Field(None, max_length=255)
     sequence: int = Field(0, ge=0)
 
 
@@ -63,7 +60,7 @@ class IssueStateResponse(BaseModel):
     name: str
     color: str
     group: str
-    description: Optional[str] = None
+    description: str | None = None
     is_default: bool
     sequence: int
 
@@ -75,8 +72,8 @@ class IssueStateResponse(BaseModel):
 class LabelCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     color: str = Field(pattern=r"^#[0-9a-fA-F]{6}$")
-    description: Optional[str] = Field(None, max_length=255)
-    parent_id: Optional[str] = None
+    description: str | None = Field(None, max_length=255)
+    parent_id: str | None = None
 
 
 class LabelResponse(BaseModel):
@@ -84,8 +81,8 @@ class LabelResponse(BaseModel):
     project_id: str
     name: str
     color: str
-    description: Optional[str] = None
-    parent_id: Optional[str] = None
+    description: str | None = None
+    parent_id: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -97,7 +94,7 @@ class ProjectMemberResponse(BaseModel):
     user_id: str
     display_name: str
     email: str
-    avatar_url: Optional[str] = None
+    avatar_url: str | None = None
     role: str
 
     model_config = {"from_attributes": True}

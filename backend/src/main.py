@@ -2,18 +2,17 @@
 Helix Backend — Main Application Entry Point
 """
 
-import structlog
-from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
+import structlog
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from src.core.config import settings
 from src.core.exceptions import register_exception_handlers
 from src.core.middleware import register_middleware
-from src.core.rate_limit import RateLimitMiddleware
-from src.infrastructure.cache.redis import close_redis, init_redis, get_redis_client
+from src.infrastructure.cache.redis import close_redis, get_redis_client, init_redis
 
 logger = structlog.get_logger(__name__)
 
@@ -86,17 +85,17 @@ def create_application() -> FastAPI:
 
 def _register_routers(app: FastAPI) -> None:
     """Register all module routers under /api/v1."""
-    from src.modules.auth.router import router as auth_router
-    from src.modules.users.router import router as users_router
-    from src.modules.organizations.router import router as orgs_router
-    from src.modules.workspaces.router import router as workspaces_router
-    from src.modules.projects.router import router as projects_router
-    from src.modules.issues.router import router as issues_router
-    from src.modules.realtime.router import router as realtime_router
-    from src.modules.notifications.router import router as notifications_router
-    from src.modules.cycles.router import router as cycles_router
-    from src.modules.analytics.router import router as analytics_router
     from src.modules.ai.router import router as ai_router
+    from src.modules.analytics.router import router as analytics_router
+    from src.modules.auth.router import router as auth_router
+    from src.modules.cycles.router import router as cycles_router
+    from src.modules.issues.router import router as issues_router
+    from src.modules.notifications.router import router as notifications_router
+    from src.modules.organizations.router import router as orgs_router
+    from src.modules.projects.router import router as projects_router
+    from src.modules.realtime.router import router as realtime_router
+    from src.modules.users.router import router as users_router
+    from src.modules.workspaces.router import router as workspaces_router
 
     api_prefix = settings.API_V1_PREFIX
 
@@ -116,8 +115,9 @@ def _register_routers(app: FastAPI) -> None:
     @app.get("/api/health", tags=["System"], include_in_schema=False)
     async def health() -> dict:
         import time
-        from src.infrastructure.database.session import async_session_factory
+
         from src.core.config import settings as s
+        from src.infrastructure.database.session import async_session_factory
 
         checks: dict[str, dict] = {}
 

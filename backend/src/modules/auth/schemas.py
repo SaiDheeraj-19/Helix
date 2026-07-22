@@ -3,10 +3,8 @@ Helix — Auth Module: Pydantic Schemas
 """
 
 import re
-from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
-
 
 # =============================================================================
 # Request Schemas
@@ -108,7 +106,7 @@ class AuthUserResponse(BaseModel):
     email: str
     username: str
     display_name: str
-    avatar_url: Optional[str]
+    avatar_url: str | None
     is_email_verified: bool
     is_onboarded: bool
     status: str

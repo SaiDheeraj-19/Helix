@@ -5,9 +5,9 @@ Helix — Auth Module: Models
 import uuid
 from datetime import datetime
 from enum import StrEnum
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -39,11 +39,11 @@ class RefreshToken(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     token_hash: Mapped[str] = mapped_column(String(128), nullable=False, unique=True, index=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    revoked_at: Mapped[Optional[datetime]] = mapped_column(
+    revoked_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
-    ip_address: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
-    user_agent: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
+    user_agent: Mapped[str | None] = mapped_column(String(512), nullable=True)
     family: Mapped[str] = mapped_column(
         String(36),
         default=lambda: str(uuid.uuid4()),
@@ -81,10 +81,10 @@ class OAuthAccount(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     provider: Mapped[str] = mapped_column(String(50), nullable=False)
     provider_user_id: Mapped[str] = mapped_column(String(255), nullable=False)
-    provider_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    access_token: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
-    refresh_token: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
-    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    provider_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    access_token: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    refresh_token: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="oauth_accounts")
