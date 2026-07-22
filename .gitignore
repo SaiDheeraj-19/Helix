@@ -1,119 +1,137 @@
-node_modules
-.next
-.yarn
+# =============================================================================
+# Helix — .gitignore
+# =============================================================================
 
-### NextJS ###
-# Dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# Testing
-/coverage
-
-# Next.js
-/.next/
-/out/
-
-# Production
-dist/
-out/
-build/
-.react-router/
-
-# Misc
+# --- OS ---
 .DS_Store
-*.pem
-.history
-tsconfig.tsbuildinfo
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Debug
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Environment ---
+.env
+.env.*
+!.env.example
+!.env.test.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Poetry
+poetry.lock
+!poetry.lock
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# --- Node.js ---
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-.pnpm-debug.log*
+.pnpm-store/
+.yarn/
 
-# Local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# --- Next.js ---
+.next/
+out/
+build/
+.vercel/
+.turbo/
 
-# Vercel
-.vercel
-
-# Turborepo
-.turbo
-
-## Django ##
-venv
-.venv
-*.pyc
-staticfiles
-mediafiles
-.env
-.DS_Store
+# --- Logs ---
 logs/
-htmlcov/
-.coverage
+*.log
+lerna-debug.log*
 
-node_modules/
-assets/dist/
-npm-debug.log
-yarn-error.log
-pnpm-debug.log
+# --- Docker ---
+.dockerignore
 
-# Editor directories and files
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-package-lock.json
-.vscode
+# --- Database ---
+*.sqlite
+*.sqlite3
+*.db
+postgres-data/
+redis-data/
+minio-data/
+rabbitmq-data/
+qdrant-data/
 
-# Sentry
-.sentryclirc
+# --- Uploads / Media ---
+uploads/
+media/
 
-# lock files
-package-lock.json
+# --- Secrets ---
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
 
+# --- Coverage ---
+coverage/
+.nyc_output/
 
+# --- Testing ---
+playwright-report/
+test-results/
+.playwright/
 
-.secrets
+# --- Misc ---
+.cache/
 tmp/
-
-## packages
-dist
-.temp/
-deploy/selfhost/plane-app/
-
-## Storybook
-*storybook.log
-output.css
-
-dev-editor
-# Redis
-*.rdb
-*.rdb.gz
-
-storybook-static
-
-CLAUDE.md
-
-build/
-.react-router/
-
-build/
-.react-router/
 temp/
-scripts/
-!packages/i18n/scripts/
-
-# i18n auto-generated types (regenerated on every build)
-packages/i18n/src/types/keys.generated.ts
-
-# Local security notes (not for version control)
-/security/
+*.tmp
+*.bak
+*.orig
