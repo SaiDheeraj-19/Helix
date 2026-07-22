@@ -2,6 +2,7 @@ services:
   - type: web
     name: helix-backend
     env: python
+    plan: free
     region: ohio
     buildCommand: "cd backend && pip install poetry && poetry config virtualenvs.create false && poetry install --only main"
     startCommand: "cd backend && uvicorn src.main:app --host 0.0.0.0 --port $PORT"
