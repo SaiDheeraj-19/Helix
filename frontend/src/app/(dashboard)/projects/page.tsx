@@ -129,165 +129,144 @@ export default function ProjectsPage() {
               </button>
             </Dialog.Trigger>
 
+const COVER_IMAGES = [
+  "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1200&h=400",
+  "https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=1200&h=400",
+  "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&h=400",
+  "https://images.unsplash.com/photo-1505322022379-7c3353ee6291?auto=format&fit=crop&w=1200&h=400",
+  "https://images.unsplash.com/photo-1531366936337-77cf5e08ce5a?auto=format&fit=crop&w=1200&h=400"
+];
+
+// ... (in component)
+  const [coverIndex, setCoverIndex] = useState(0);
+
+// ... (inside return)
             {/* Create Project Modal */}
             <Dialog.Portal>
-              <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+              <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
               <Dialog.Content className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  initial={{ opacity: 0, scale: 0.98, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                  className="w-full max-w-[560px] rounded-2xl border border-border bg-card shadow-2xl overflow-hidden"
+                  exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                  className="w-full max-w-[720px] rounded-xl border border-border/50 bg-[#151515] shadow-2xl overflow-hidden"
                 >
-                  {/* Premium Header */}
-                  <div className="relative px-6 py-6 overflow-hidden border-b border-border bg-muted/30">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
-                    <Dialog.Title className="text-xl font-semibold tracking-tight text-foreground flex items-center gap-2">
-                      Create new project
-                    </Dialog.Title>
-                    <p className="text-sm text-muted-foreground mt-1">Set up a new space for your team's work.</p>
-                    <Dialog.Close asChild>
-                      <button className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </Dialog.Close>
-                  </div>
-
                   <form
-                    onSubmit={handleSubmit((d) => createMutation.mutate(d))}
-                    className="p-6 space-y-6"
+                    onSubmit={handleSubmit((d) => createMutation.mutate({ ...d, color: COVER_IMAGES[coverIndex] }))}
+                    className="flex flex-col"
                   >
-                    {/* Basic Info */}
-                    <div className="grid grid-cols-[1fr,120px] gap-6">
-                      <div className="space-y-4">
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium">Project name <span className="text-destructive">*</span></label>
-                          <input
-                            {...register("name")}
-                            placeholder="e.g. Frontend Architecture"
-                            className="w-full px-4 py-2.5 rounded-xl border border-input bg-background/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                            autoFocus
-                          />
-                          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-                        </div>
-                        
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium">Identifier <span className="text-destructive">*</span></label>
-                          <div className="relative">
-                            <input
-                              {...register("identifier")}
-                              placeholder={autoIdentifier || "FRT"}
-                              className="w-full px-4 py-2.5 rounded-xl border border-input bg-background/50 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-16"
-                              onChange={(e) => {
-                                e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-                                register("identifier").onChange(e);
-                              }}
-                            />
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase font-bold tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded border border-border">
-                              ID
-                            </div>
-                          </div>
-                          {errors.identifier && <p className="text-xs text-destructive">{errors.identifier.message}</p>}
-                        </div>
-                      </div>
-
-                      <div className="space-y-1.5 pt-1">
-                        <label className="text-sm font-medium mb-3 block">Color</label>
-                        <div className="flex flex-wrap gap-2">
-                          {PROJECT_COLORS.map((c) => (
-                            <button
-                              key={c}
-                              type="button"
-                              onClick={() => {
-                                setSelectedColor(c);
-                                setValue("color", c);
-                              }}
-                              className={cn(
-                                "w-6 h-6 rounded-full transition-all flex items-center justify-center relative",
-                                selectedColor === c ? "scale-110 shadow-sm" : "hover:scale-110 opacity-80 hover:opacity-100"
-                              )}
-                              style={{ 
-                                backgroundColor: c,
-                              }}
-                            >
-                              {selectedColor === c && (
-                                <div className="absolute inset-0 rounded-full border-2 border-background ring-2 ring-offset-1" style={{ "--tw-ring-color": c } as any} />
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium">Description</label>
-                      <textarea
-                        {...register("description")}
-                        placeholder="Briefly describe what this project is for..."
-                        rows={2}
-                        className="w-full px-4 py-3 rounded-xl border border-input bg-background/50 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    {/* Cover Photo Area */}
+                    <div className="relative h-[200px] w-full bg-muted overflow-hidden group">
+                      <img 
+                        src={COVER_IMAGES[coverIndex]} 
+                        alt="Cover" 
+                        className="w-full h-full object-cover transition-opacity duration-300" 
                       />
-                    </div>
-
-                    <div className="space-y-3">
-                      <label className="text-sm font-medium">Visibility & Access</label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {(["secret", "public", "private"] as const).map((n) => {
-                          const cfg = networkConfig[n];
-                          const isSelected = watch("network") === n;
-                          return (
-                            <button
-                              key={n}
-                              type="button"
-                              onClick={() => setValue("network", n)}
-                              className={cn(
-                                "relative flex flex-col items-start gap-2 p-3 rounded-xl border text-left transition-all overflow-hidden group",
-                                isSelected
-                                  ? "border-primary bg-primary/[0.03] shadow-sm"
-                                  : "border-border hover:border-border/80 hover:bg-muted/50 bg-background/50"
-                              )}
-                            >
-                              {isSelected && (
-                                <div className="absolute top-0 left-0 w-full h-1 bg-primary" />
-                              )}
-                              <div className={cn("p-1.5 rounded-lg", cfg.color)}>
-                                <cfg.icon className="w-4 h-4" />
-                              </div>
-                              <div>
-                                <p className={cn("text-sm font-semibold mb-0.5", isSelected ? "text-primary" : "text-foreground")}>{cfg.label}</p>
-                                <p className="text-[10px] text-muted-foreground leading-tight">
-                                  {n === "secret" && "Visible only to members."}
-                                  {n === "public" && "Visible to workspace."}
-                                  {n === "private" && "Visible to teams."}
-                                </p>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end gap-3 pt-6 border-t border-border mt-6">
+                      
                       <Dialog.Close asChild>
-                        <button
-                          type="button"
-                          className="px-5 py-2.5 text-sm font-medium rounded-xl border border-border bg-background hover:bg-muted transition-colors"
-                        >
-                          Cancel
+                        <button type="button" className="absolute top-4 right-4 p-1.5 rounded-md bg-black/40 text-white/70 hover:text-white hover:bg-black/60 transition-colors backdrop-blur-md">
+                          <X className="w-4 h-4" />
                         </button>
                       </Dialog.Close>
+
+                      <div className="absolute bottom-4 left-6 flex items-center justify-center w-8 h-8 rounded-md bg-black/40 border border-white/10 backdrop-blur-md cursor-pointer hover:bg-black/60 transition-colors text-white/80">
+                        <span className="text-sm">✨</span>
+                      </div>
+
                       <button
-                        type="submit"
-                        disabled={isSubmitting || createMutation.isPending}
-                        className="flex items-center justify-center gap-2 px-6 py-2.5 text-sm text-white font-semibold rounded-xl hover:opacity-90 disabled:opacity-60 transition-all shadow-sm active:scale-[0.98]"
-                        style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)" }}
+                        type="button"
+                        onClick={() => setCoverIndex((prev) => (prev + 1) % COVER_IMAGES.length)}
+                        className="absolute bottom-4 right-4 px-3 py-1.5 rounded-md bg-black/40 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
                       >
-                        {createMutation.isPending ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          "Create project"
-                        )}
+                        Change cover
                       </button>
+                    </div>
+
+                    <div className="p-6 space-y-4">
+                      {/* Project Name and ID Row */}
+                      <div className="grid grid-cols-[1fr,200px] gap-3">
+                        <div className="relative">
+                          <input
+                            {...register("name")}
+                            placeholder="Project name"
+                            className="w-full px-3 py-2.5 rounded-md border border-[#2b2b2b] bg-[#1e1e1e] text-sm focus:outline-none focus:border-[#404040] transition-all text-white placeholder:text-white/30"
+                            autoFocus
+                          />
+                        </div>
+                        <div className="relative">
+                          <input
+                            {...register("identifier")}
+                            placeholder={autoIdentifier || "FRT"}
+                            className="w-full px-3 py-2.5 rounded-md border border-[#2b2b2b] bg-[#1e1e1e] text-sm font-mono uppercase focus:outline-none focus:border-[#404040] transition-all pr-8 text-white placeholder:text-white/30"
+                            onChange={(e) => {
+                              e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                              register("identifier").onChange(e);
+                            }}
+                          />
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 text-xs">
+                            ID
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <div className="relative">
+                        <textarea
+                          {...register("description")}
+                          placeholder="Description"
+                          rows={3}
+                          className="w-full px-3 py-2.5 rounded-md border border-[#2b2b2b] bg-[#1e1e1e] text-sm resize-none focus:outline-none focus:border-[#404040] transition-all text-white placeholder:text-white/30"
+                        />
+                        <div className="absolute bottom-2 right-2">
+                          <svg className="w-3 h-3 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" /></svg>
+                        </div>
+                      </div>
+
+                      {/* Bottom Controls */}
+                      <div className="flex items-center justify-between pt-4">
+                        {/* Network / Visibility */}
+                        <div className="flex items-center gap-2">
+                          {(["public", "secret", "private"] as const).map((n) => {
+                            const cfg = networkConfig[n];
+                            const isSelected = watch("network") === n;
+                            return (
+                              <button
+                                key={n}
+                                type="button"
+                                onClick={() => setValue("network", n)}
+                                className={cn(
+                                  "flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-medium transition-all",
+                                  isSelected
+                                    ? "border-white/20 bg-white/10 text-white"
+                                    : "border-transparent text-white/50 hover:bg-white/5 hover:text-white/80"
+                                )}
+                              >
+                                <cfg.icon className="w-3.5 h-3.5" />
+                                {cfg.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Submit */}
+                        <div className="flex items-center gap-2">
+                          <Dialog.Close asChild>
+                            <button
+                              type="button"
+                              className="px-4 py-2 text-sm font-medium rounded text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </Dialog.Close>
+                          <button
+                            type="submit"
+                            disabled={isSubmitting || createMutation.isPending}
+                            className="px-4 py-2 text-sm text-white font-medium rounded bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-60 transition-colors shadow-sm"
+                          >
+                            {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create project"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </form>
                 </motion.div>
