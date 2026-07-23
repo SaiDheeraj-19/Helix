@@ -102,7 +102,7 @@ async def oauth_google_callback(
             value=login_resp.tokens.refresh_token,
             httponly=True,
             secure=settings.is_production,
-            samesite="lax",
+            samesite="none" if settings.is_production else "lax",
             max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
         )
         return response
@@ -178,7 +178,7 @@ async def oauth_github_callback(
             value=login_resp.tokens.refresh_token,
             httponly=True,
             secure=settings.is_production,
-            samesite="lax",
+            samesite="none" if settings.is_production else "lax",
             max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
         )
         return response
@@ -221,7 +221,7 @@ async def register(
         value=result.tokens.refresh_token,
         httponly=True,
         secure=settings.is_production,
-        samesite="lax",
+        samesite="none" if settings.is_production else "lax",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
     )
     return response
@@ -244,7 +244,7 @@ async def login(
         value=result.tokens.refresh_token,
         httponly=True,
         secure=settings.is_production,
-        samesite="lax",
+        samesite="none" if settings.is_production else "lax",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
     )
     return response
@@ -276,7 +276,7 @@ async def refresh_token(
         value=result.refresh_token,
         httponly=True,
         secure=settings.is_production,
-        samesite="lax",
+        samesite="none" if settings.is_production else "lax",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
     )
     return response
