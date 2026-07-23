@@ -84,6 +84,10 @@ export default function AIAssistantPage() {
             if (payload === "[DONE]") break;
             try {
               const parsed = JSON.parse(payload);
+              if (parsed.error) {
+                toast.error("AI service error", { description: parsed.error });
+                break;
+              }
               if (parsed.content) {
                 accumulated += parsed.content;
                 setMessages(prev =>
