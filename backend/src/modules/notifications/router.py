@@ -1,4 +1,5 @@
 from typing import Any
+
 """Helix — Notifications Module: Router"""
 from datetime import UTC, datetime
 from uuid import UUID
@@ -32,9 +33,7 @@ async def list_notifications(
     unread_only: bool = False,
 ) -> Any:
     """Get all notifications for the current user."""
-    query = select(InAppNotification).where(
-        InAppNotification.user_id == current_user_id
-    )
+    query = select(InAppNotification).where(InAppNotification.user_id == current_user_id)
     if unread_only:
         query = query.where(InAppNotification.is_read == False)  # noqa: E712
     query = query.order_by(InAppNotification.created_at.desc()).limit(50)
@@ -42,19 +41,21 @@ async def list_notifications(
     result = await db.execute(query)
     notifications = result.scalars().all()
 
-    return ok([
-        NotificationResponse(
-            id=str(n.id),
-            title=n.title,
-            message=n.message,
-            notification_type=n.notification_type,
-            entity_type=n.entity_type,
-            entity_id=str(n.entity_id) if n.entity_id else None,
-            is_read=n.is_read,
-            created_at=n.created_at.isoformat(),
-        )
-        for n in notifications
-    ])
+    return ok(
+        [
+            NotificationResponse(
+                id=str(n.id),
+                title=n.title,
+                message=n.message,
+                notification_type=n.notification_type,
+                entity_type=n.entity_type,
+                entity_id=str(n.entity_id) if n.entity_id else None,
+                is_read=n.is_read,
+                created_at=n.created_at.isoformat(),
+            )
+            for n in notifications
+        ]
+    )
 
 
 @router.post("/{notification_id}/read", status_code=status.HTTP_204_NO_CONTENT)
@@ -90,6 +91,7 @@ async def mark_all_read(current_user_id: CurrentUserID, db: DBSession) -> Any:
 async def unread_count(current_user_id: CurrentUserID, db: DBSession) -> Any:
     """Get unread notification count for badge display."""
     from sqlalchemy import func
+
     result = await db.execute(
         select(func.count()).where(
             InAppNotification.user_id == current_user_id,

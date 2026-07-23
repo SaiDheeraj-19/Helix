@@ -39,9 +39,7 @@ class RefreshToken(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     token_hash: Mapped[str] = mapped_column(String(128), nullable=False, unique=True, index=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    revoked_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
     user_agent: Mapped[str | None] = mapped_column(String(512), nullable=True)
     family: Mapped[str] = mapped_column(
@@ -69,9 +67,7 @@ class OAuthAccount(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     """
 
     __tablename__ = "oauth_accounts"
-    __table_args__ = (
-        UniqueConstraint("provider", "provider_user_id", name="uq_oauth_provider_user"),
-    )
+    __table_args__ = (UniqueConstraint("provider", "provider_user_id", name="uq_oauth_provider_user"),)
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),

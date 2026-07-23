@@ -49,10 +49,12 @@ class ConnectionManager:
         exclude_user: str | None = None,
     ) -> None:
         """Broadcast an event to all clients in a room."""
-        message = json.dumps({
-            "type": event_type,
-            "data": data,
-        })
+        message = json.dumps(
+            {
+                "type": event_type,
+                "data": data,
+            }
+        )
         disconnected: list[str] = []
         for uid, ws in list(self._rooms.get(room_id, {}).items()):
             if uid == exclude_user:
@@ -86,6 +88,7 @@ manager = ConnectionManager()
 
 
 # ─── Event type constants ─────────────────────────────────────────────────────
+
 
 class WSEvent:
     ISSUE_CREATED = "issue.created"

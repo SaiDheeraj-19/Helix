@@ -43,9 +43,7 @@ class SuccessResponse(BaseModel, Generic[T]):
     data: T
     meta: dict[str, Any] | None = None
     request_id: str = Field(default_factory=lambda: str(uuid4()))
-    timestamp: str = Field(
-        default_factory=lambda: datetime.now(UTC).isoformat()
-    )
+    timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
 
 
 class PaginatedResponse(BaseModel, Generic[T]):
@@ -55,9 +53,7 @@ class PaginatedResponse(BaseModel, Generic[T]):
     data: list[T]
     meta: PaginationMeta
     request_id: str = Field(default_factory=lambda: str(uuid4()))
-    timestamp: str = Field(
-        default_factory=lambda: datetime.now(UTC).isoformat()
-    )
+    timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
 
 
 class ErrorDetail(BaseModel):
@@ -73,9 +69,7 @@ class ErrorResponse(BaseModel):
     data: None = None
     errors: ErrorDetail
     request_id: str = Field(default_factory=lambda: str(uuid4()))
-    timestamp: str = Field(
-        default_factory=lambda: datetime.now(UTC).isoformat()
-    )
+    timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
 
 
 def ok(data: T, meta: dict[str, Any] | None = None) -> SuccessResponse[T]:

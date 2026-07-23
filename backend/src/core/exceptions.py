@@ -159,9 +159,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(
-        request: Request, exc: RequestValidationError
-    ) -> ORJSONResponse:
+    async def validation_exception_handler(request: Request, exc: RequestValidationError) -> ORJSONResponse:
         request_id = getattr(request.state, "request_id", str(uuid4()))
         field_errors: dict[str, list[str]] = {}
         for error in exc.errors():

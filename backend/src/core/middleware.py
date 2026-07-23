@@ -4,6 +4,7 @@ Request ID injection, structured logging, CORS, rate limiting.
 """
 
 import time
+from collections.abc import Awaitable, Callable
 from uuid import uuid4
 
 import structlog
@@ -11,7 +12,6 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from typing import Any, Callable, Awaitable
 
 from src.core.config import settings
 
@@ -80,9 +80,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
 
         if settings.is_production:
-            response.headers["Strict-Transport-Security"] = (
-                "max-age=31536000; includeSubDomains; preload"
-            )
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
             response.headers["Content-Security-Policy"] = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
@@ -125,7 +123,8 @@ def register_middleware(app: FastAPI) -> None:
 
     # Rate limiting
     from src.core.rate_limit import RateLimitMiddleware
-    app.add_middleware(RateLimitMiddleware) # type: ignore
+
+    app.add_middleware(RateLimitMiddleware)  # type: ignore
 
     # Security headers
     app.add_middleware(SecurityHeadersMiddleware)

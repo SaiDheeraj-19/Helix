@@ -97,7 +97,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
-    SMTP_FROM: str = "no-reply@helix.app"          # matches SMTP_FROM in .env
+    SMTP_FROM: str = "no-reply@helix.app"  # matches SMTP_FROM in .env
     SMTP_FROM_NAME: str = "Helix"
     SMTP_TLS: bool = True
 
@@ -167,6 +167,7 @@ class Settings(BaseSettings):
         cors = values.get("CORS_ORIGINS") or values.get("cors_origins")
         if cors is not None and not isinstance(cors, list):
             import json
+
             stripped = str(cors).strip()
             if stripped.startswith("["):
                 try:
@@ -204,6 +205,7 @@ class Settings(BaseSettings):
             return v
         if isinstance(v, str):
             import json
+
             stripped = v.strip()
             if stripped.startswith("["):
                 try:

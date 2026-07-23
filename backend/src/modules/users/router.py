@@ -1,4 +1,5 @@
 from typing import Any
+
 """Helix — Users Module: Router (stub)"""
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -43,6 +44,7 @@ async def get_avatar_upload_url(data: AvatarUploadRequest, current_user_id: Curr
 
     # Generate unique key
     import uuid
+
     ext = data.file_name.split(".")[-1] if "." in data.file_name else "png"
     storage_key = f"{current_user_id}/{uuid.uuid4().hex}.{ext}"
 
@@ -57,7 +59,7 @@ async def get_avatar_upload_url(data: AvatarUploadRequest, current_user_id: Curr
         bucket=settings.MINIO_ATTACHMENTS_BUCKET,
         key=storage_key,
         filename=data.file_name,
-        expires_in=604800, # 7 days
+        expires_in=604800,  # 7 days
     )
 
     return ok(AvatarUploadResponse(upload_url=upload_url, avatar_url=avatar_url))

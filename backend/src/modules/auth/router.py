@@ -1,4 +1,5 @@
 from typing import Any
+
 """
 Helix — Auth Module: Router
 FastAPI route handlers for authentication endpoints.
@@ -49,6 +50,7 @@ def _get_request_meta(request: Request) -> dict[str, Any]:
 async def oauth_google_login() -> RedirectResponse:
     """Redirect browser to Google's authorization page."""
     from src.modules.auth.oauth_service import generate_state, get_google_auth_url
+
     state = generate_state()
     url = get_google_auth_url(state)
     return RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)
@@ -73,7 +75,6 @@ async def oauth_google_callback(
         err_msg = urllib.parse.quote(error or "no_code", safe="")
         return RedirectResponse(url=f"{frontend_callback}?error={err_msg}")
 
-
     from src.modules.auth.oauth_service import (
         exchange_google_code,
         find_or_create_oauth_user,
@@ -97,15 +98,12 @@ async def oauth_google_callback(
         await db.commit()
 
         user_json = urllib.parse.quote(login_resp.user.model_dump_json(), safe="")
-        params = (
-            f"access_token={login_resp.tokens.access_token}"
-            f"&refresh_token={login_resp.tokens.refresh_token}"
-            f"&user={user_json}"
-        )
+        params = f"access_token={login_resp.tokens.access_token}" f"&refresh_token={login_resp.tokens.refresh_token}" f"&user={user_json}"
         return RedirectResponse(url=f"{frontend_callback}?{params}")
 
     except Exception as exc:
         import structlog
+
         structlog.get_logger(__name__).error("google_oauth_callback_error", error=str(exc))
         err_msg = urllib.parse.quote(str(exc)[:200], safe="")
         return RedirectResponse(url=f"{frontend_callback}?error={err_msg}")
@@ -119,6 +117,7 @@ async def oauth_google_callback(
 async def oauth_github_login() -> RedirectResponse:
     """Redirect browser to GitHub's authorization page."""
     from src.modules.auth.oauth_service import generate_state, get_github_auth_url
+
     state = generate_state()
     url = get_github_auth_url(state)
     return RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)
@@ -143,7 +142,6 @@ async def oauth_github_callback(
         err_msg = urllib.parse.quote(error or "no_code", safe="")
         return RedirectResponse(url=f"{frontend_callback}?error={err_msg}")
 
-
     from src.modules.auth.oauth_service import (
         exchange_github_code,
         find_or_create_oauth_user,
@@ -167,20 +165,15 @@ async def oauth_github_callback(
         await db.commit()
 
         user_json = urllib.parse.quote(login_resp.user.model_dump_json(), safe="")
-        params = (
-            f"access_token={login_resp.tokens.access_token}"
-            f"&refresh_token={login_resp.tokens.refresh_token}"
-            f"&user={user_json}"
-        )
+        params = f"access_token={login_resp.tokens.access_token}" f"&refresh_token={login_resp.tokens.refresh_token}" f"&user={user_json}"
         return RedirectResponse(url=f"{frontend_callback}?{params}")
 
     except Exception as exc:
         import structlog
+
         structlog.get_logger(__name__).error("github_oauth_callback_error", error=str(exc))
         err_msg = urllib.parse.quote(str(exc)[:200], safe="")
         return RedirectResponse(url=f"{frontend_callback}?error={err_msg}")
-
-
 
 
 # ─────────────────────────────────────────────
@@ -306,11 +299,7 @@ async def forgot_password(
     db: DBSession,
 ) -> ORJSONResponse:
     # Always return success to prevent email enumeration
-    return ORJSONResponse(
-        content=ok(
-            MessageResponse(message="If an account exists, a reset link has been sent")
-        ).model_dump()
-    )
+    return ORJSONResponse(content=ok(MessageResponse(message="If an account exists, a reset link has been sent")).model_dump())
 
 
 @router.post(
@@ -322,6 +311,4 @@ async def reset_password(
     data: ResetPasswordRequest,
     db: DBSession,
 ) -> ORJSONResponse:
-    return ORJSONResponse(
-        content=ok(MessageResponse(message="Password reset successfully")).model_dump()
-    )
+    return ORJSONResponse(content=ok(MessageResponse(message="Password reset successfully")).model_dump())

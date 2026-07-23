@@ -1,4 +1,5 @@
 from typing import Any
+
 """Helix — Issues Module: Router"""
 from uuid import UUID
 
@@ -26,6 +27,7 @@ router = APIRouter(tags=["Issues"])
 
 
 # ─── Issues CRUD ───────────────────────────────────────────────────────────────
+
 
 @router.post(
     "/projects/{project_id}/issues",
@@ -132,6 +134,7 @@ async def move_issue(
 
 # ─── Comments ──────────────────────────────────────────────────────────────────
 
+
 @router.get(
     "/issues/{issue_id}/comments",
     response_model=SuccessResponse[list[CommentResponse]],
@@ -147,18 +150,14 @@ async def list_comments(issue_id: UUID, current_user_id: CurrentUserID, db: DBSe
     response_model=SuccessResponse[CommentResponse],
     status_code=status.HTTP_201_CREATED,
 )
-async def add_comment(
-    issue_id: UUID, data: CommentCreate, current_user_id: CurrentUserID, db: DBSession
-) -> Any:
+async def add_comment(issue_id: UUID, data: CommentCreate, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = IssueService(db)
     comment = await service.add_comment(issue_id, data, current_user_id)
     return ok(_serialize_comment(comment))
 
 
 @router.patch("/comments/{comment_id}", response_model=SuccessResponse[CommentResponse])
-async def update_comment(
-    comment_id: UUID, data: CommentUpdate, current_user_id: CurrentUserID, db: DBSession
-) -> Any:
+async def update_comment(comment_id: UUID, data: CommentUpdate, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = IssueService(db)
     comment = await service.update_comment(comment_id, data, current_user_id)
     return ok(_serialize_comment(comment))
@@ -172,6 +171,7 @@ async def delete_comment(comment_id: UUID, current_user_id: CurrentUserID, db: D
 
 # ─── Activities ────────────────────────────────────────────────────────────────
 
+
 @router.get(
     "/issues/{issue_id}/activities",
     response_model=SuccessResponse[list[ActivityResponse]],
@@ -184,15 +184,14 @@ async def get_activities(issue_id: UUID, current_user_id: CurrentUserID, db: DBS
 
 # ─── Attachments ───────────────────────────────────────────────────────────────
 
+
 @router.post(
     "/issues/{issue_id}/attachments/upload-url",
     response_model=SuccessResponse[AttachmentUploadResponse],
     status_code=status.HTTP_201_CREATED,
     summary="Get presigned URL for direct file upload",
 )
-async def get_upload_url(
-    issue_id: UUID, data: AttachmentUploadRequest, current_user_id: CurrentUserID, db: DBSession
-) -> Any:
+async def get_upload_url(issue_id: UUID, data: AttachmentUploadRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = IssueService(db)
     result = await service.initiate_upload(issue_id, data, current_user_id)
     return ok(result)
@@ -206,24 +205,26 @@ async def list_attachments(issue_id: UUID, current_user_id: CurrentUserID, db: D
     service = IssueService(db)
     attachments = await service.get_attachments(issue_id)
     from src.infrastructure.storage.minio import StorageService
+
     storage = StorageService()
     result = []
     for a in attachments:
-        result.append(AttachmentResponse(
-            id=str(a.id),
-            issue_id=str(a.issue_id),
-            file_name=a.file_name,
-            file_size=a.file_size,
-            content_type=a.content_type,
-            download_url=storage.generate_presigned_download_url(
-                bucket=a.bucket, key=a.storage_key, filename=a.file_name
-            ),
-            created_at=a.created_at.isoformat(),
-        ))
+        result.append(
+            AttachmentResponse(
+                id=str(a.id),
+                issue_id=str(a.issue_id),
+                file_name=a.file_name,
+                file_size=a.file_size,
+                content_type=a.content_type,
+                download_url=storage.generate_presigned_download_url(bucket=a.bucket, key=a.storage_key, filename=a.file_name),
+                created_at=a.created_at.isoformat(),
+            )
+        )
     return ok(result)
 
 
 # ─── Serialization helpers ─────────────────────────────────────────────────────
+
 
 def _serialize_issue(issue: Any) -> IssueResponse:
     from src.modules.issues.schemas import LabelSlim, StateSlim, UserSlim
@@ -232,10 +233,14 @@ def _serialize_issue(issue: Any) -> IssueResponse:
     for link in getattr(issue, "assignees", []):
         u = link.user
         if u:
-            assignees.append(UserSlim(
-                id=str(u.id), display_name=u.display_name,
-                email=u.email, avatar_url=u.avatar_url,
-            ))
+            assignees.append(
+                UserSlim(
+                    id=str(u.id),
+                    display_name=u.display_name,
+                    email=u.email,
+                    avatar_url=u.avatar_url,
+                )
+            )
 
     labels = []
     for link in getattr(issue, "label_links", []):
@@ -258,8 +263,10 @@ def _serialize_issue(issue: Any) -> IssueResponse:
         description_html=issue.description_html,
         priority=issue.priority,
         state=StateSlim(
-            id=str(state.id), name=state.name,
-            color=state.color, group=state.group,
+            id=str(state.id),
+            name=state.name,
+            color=state.color,
+            group=state.group,
         ),
         assignees=assignees,
         labels=labels,
@@ -279,7 +286,6 @@ def _serialize_issue(issue: Any) -> IssueResponse:
 
 
 def _serialize_comment(comment: Any) -> CommentResponse:
-
     from src.modules.issues.schemas import UserSlim
 
     actor = None

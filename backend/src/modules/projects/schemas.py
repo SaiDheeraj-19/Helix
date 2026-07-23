@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, field_validator
 
 # ─── Project ───────────────────────────────────────────────────────────────────
 
+
 class ProjectCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     identifier: str = Field(min_length=1, max_length=10)
@@ -46,6 +47,7 @@ class ProjectResponse(BaseModel):
 
 # ─── Issue State ───────────────────────────────────────────────────────────────
 
+
 class IssueStateCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     color: str = Field(pattern=r"^#[0-9a-fA-F]{6}$")
@@ -69,6 +71,7 @@ class IssueStateResponse(BaseModel):
 
 # ─── Label ─────────────────────────────────────────────────────────────────────
 
+
 class LabelCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     color: str = Field(pattern=r"^#[0-9a-fA-F]{6}$")
@@ -88,6 +91,7 @@ class LabelResponse(BaseModel):
 
 
 # ─── Member ────────────────────────────────────────────────────────────────────
+
 
 class ProjectMemberResponse(BaseModel):
     id: str

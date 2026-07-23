@@ -1,7 +1,8 @@
-from typing import Any
-"""Helix — Cycles Module: Service"""
 from __future__ import annotations
 
+from typing import Any
+
+"""Helix — Cycles Module: Service"""
 from uuid import UUID
 
 from sqlalchemy import delete, select
@@ -44,9 +45,7 @@ class CycleService:
 
     async def get_by_id(self, cycle_id: UUID) -> Cycle:
         result = await self._db.execute(
-            select(Cycle)
-            .where(Cycle.id == cycle_id)
-            .options(selectinload(Cycle.issues).selectinload(CycleIssue.issue).selectinload(Issue.state))
+            select(Cycle).where(Cycle.id == cycle_id).options(selectinload(Cycle.issues).selectinload(CycleIssue.issue).selectinload(Issue.state))
         )
         cycle = result.scalar_one_or_none()
         if not cycle:
@@ -70,9 +69,7 @@ class CycleService:
         cycle = await self.get_by_id(cycle_id)
 
         # Get existing to avoid duplicates
-        existing_result = await self._db.execute(
-            select(CycleIssue.issue_id).where(CycleIssue.cycle_id == cycle_id)
-        )
+        existing_result = await self._db.execute(select(CycleIssue.issue_id).where(CycleIssue.cycle_id == cycle_id))
         existing_ids = {str(r) for r in existing_result.scalars().all()}
 
         for issue_id in issue_ids:

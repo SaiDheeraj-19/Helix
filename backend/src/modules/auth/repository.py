@@ -23,22 +23,15 @@ class AuthRepository:
     # ─────────────────────────────────────────────
 
     async def get_user_by_email(self, email: str) -> User | None:
-        result = await self._db.execute(
-            select(User)
-            .where(User.email == email.lower(), User.deleted_at.is_(None))
-        )
+        result = await self._db.execute(select(User).where(User.email == email.lower(), User.deleted_at.is_(None)))
         return result.scalar_one_or_none()
 
     async def get_user_by_id(self, user_id: UUID) -> User | None:
-        result = await self._db.execute(
-            select(User).where(User.id == user_id, User.deleted_at.is_(None))
-        )
+        result = await self._db.execute(select(User).where(User.id == user_id, User.deleted_at.is_(None)))
         return result.scalar_one_or_none()
 
     async def get_user_by_username(self, username: str) -> User | None:
-        result = await self._db.execute(
-            select(User).where(User.username == username.lower(), User.deleted_at.is_(None))
-        )
+        result = await self._db.execute(select(User).where(User.username == username.lower(), User.deleted_at.is_(None)))
         return result.scalar_one_or_none()
 
     async def create_user(
@@ -59,11 +52,7 @@ class AuthRepository:
         return user
 
     async def mark_email_verified(self, user_id: UUID) -> None:
-        await self._db.execute(
-            update(User)
-            .where(User.id == user_id)
-            .values(is_email_verified=True, status="active")
-        )
+        await self._db.execute(update(User).where(User.id == user_id).values(is_email_verified=True, status="active"))
 
     # ─────────────────────────────────────────────
     # Refresh Token management
@@ -98,42 +87,30 @@ class AuthRepository:
 
     async def get_refresh_token(self, token: str) -> RefreshToken | None:
         token_hash = self._hash_token(token)
-        result = await self._db.execute(
-            select(RefreshToken).where(RefreshToken.token_hash == token_hash)
-        )
+        result = await self._db.execute(select(RefreshToken).where(RefreshToken.token_hash == token_hash))
         return result.scalar_one_or_none()
 
     async def revoke_refresh_token(self, token: str) -> None:
         token_hash = self._hash_token(token)
-        await self._db.execute(
-            update(RefreshToken)
-            .where(RefreshToken.token_hash == token_hash)
-            .values(revoked_at=datetime.now(UTC))
-        )
+        await self._db.execute(update(RefreshToken).where(RefreshToken.token_hash == token_hash).values(revoked_at=datetime.now(UTC)))
 
     async def revoke_token_family(self, family: str) -> None:
         """Revoke all tokens in a family (reuse attack detection)."""
         await self._db.execute(
-            update(RefreshToken)
-            .where(RefreshToken.family == family, RefreshToken.revoked_at.is_(None))
-            .values(revoked_at=datetime.now(UTC))
+            update(RefreshToken).where(RefreshToken.family == family, RefreshToken.revoked_at.is_(None)).values(revoked_at=datetime.now(UTC))
         )
 
     async def revoke_all_user_tokens(self, user_id: UUID) -> None:
         """Revoke all refresh tokens for a user (logout-all-devices)."""
         await self._db.execute(
-            update(RefreshToken)
-            .where(RefreshToken.user_id == user_id, RefreshToken.revoked_at.is_(None))
-            .values(revoked_at=datetime.now(UTC))
+            update(RefreshToken).where(RefreshToken.user_id == user_id, RefreshToken.revoked_at.is_(None)).values(revoked_at=datetime.now(UTC))
         )
 
     # ─────────────────────────────────────────────
     # OAuth
     # ─────────────────────────────────────────────
 
-    async def get_oauth_account(
-        self, provider: str, provider_user_id: str
-    ) -> OAuthAccount | None:
+    async def get_oauth_account(self, provider: str, provider_user_id: str) -> OAuthAccount | None:
         result = await self._db.execute(
             select(OAuthAccount).where(
                 OAuthAccount.provider == provider,

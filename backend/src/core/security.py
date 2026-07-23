@@ -110,9 +110,7 @@ def decode_token(token: str, expected_type: TokenType | None = None) -> dict[str
         raise JWTError(f"Token validation failed: {exc}") from exc
 
     if expected_type and payload.get("type") != expected_type:
-        raise JWTError(
-            f"Invalid token type: expected '{expected_type}', got '{payload.get('type')}'"
-        )
+        raise JWTError(f"Invalid token type: expected '{expected_type}', got '{payload.get('type')}'")
 
     return dict(payload)
 

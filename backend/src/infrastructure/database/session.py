@@ -22,7 +22,7 @@ engine = create_async_engine(
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
     pool_timeout=settings.DATABASE_POOL_TIMEOUT,
     pool_pre_ping=True,  # Reconnect on stale connections
-    pool_recycle=3600,   # Recycle connections after 1 hour
+    pool_recycle=3600,  # Recycle connections after 1 hour
     connect_args={
         "server_settings": {
             "application_name": "helix-backend",

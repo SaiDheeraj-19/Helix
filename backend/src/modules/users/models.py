@@ -47,23 +47,15 @@ class User(HelixBase, Base):
     # Authentication
     hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    status: Mapped[str] = mapped_column(
-        String(30), default=UserStatus.PENDING_VERIFICATION, nullable=False, index=True
-    )
+    status: Mapped[str] = mapped_column(String(30), default=UserStatus.PENDING_VERIFICATION, nullable=False, index=True)
 
     # Onboarding
     is_onboarded: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # Relationships
-    refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
-        "RefreshToken", back_populates="user", cascade="all, delete-orphan"
-    )
-    oauth_accounts: Mapped[list["OAuthAccount"]] = relationship(
-        "OAuthAccount", back_populates="user", cascade="all, delete-orphan"
-    )
-    org_memberships: Mapped[list["OrgMembership"]] = relationship(
-        "OrgMembership", back_populates="user"
-    )
+    refresh_tokens: Mapped[list["RefreshToken"]] = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
+    oauth_accounts: Mapped[list["OAuthAccount"]] = relationship("OAuthAccount", back_populates="user", cascade="all, delete-orphan")
+    org_memberships: Mapped[list["OrgMembership"]] = relationship("OrgMembership", back_populates="user")
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email}>"

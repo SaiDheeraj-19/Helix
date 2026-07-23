@@ -1,4 +1,5 @@
 from typing import Any
+
 """Helix — Analytics Module: Router"""
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
@@ -18,15 +19,11 @@ router = APIRouter(prefix="/analytics", tags=["Analytics"])
 async def project_overview(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     """Total issues, by-state breakdown, by-priority breakdown."""
     # All issues in project
-    issues_result = await db.execute(
-        select(Issue).where(Issue.project_id == project_id, Issue.deleted_at.is_(None))
-    )
+    issues_result = await db.execute(select(Issue).where(Issue.project_id == project_id, Issue.deleted_at.is_(None)))
     issues = issues_result.scalars().all()
 
     # States map
-    states_result = await db.execute(
-        select(IssueState).where(IssueState.project_id == project_id)
-    )
+    states_result = await db.execute(select(IssueState).where(IssueState.project_id == project_id))
     states = {str(s.id): s for s in states_result.scalars().all()}
 
     # By-state
@@ -42,22 +39,25 @@ async def project_overview(project_id: UUID, current_user_id: CurrentUserID, db:
             by_group[state.group] = by_group.get(state.group, 0) + 1
         by_priority[issue.priority] = by_priority.get(issue.priority, 0) + 1
 
-    return ok({
-        "total": len(issues),
-        "by_state": [{"name": k, "count": v} for k, v in by_state.items()],
-        "by_group": [{"name": k, "count": v} for k, v in by_group.items()],
-        "by_priority": [
-            {"name": k, "count": v, "color": _priority_color(k)}
-            for k, v in by_priority.items()
-        ],
-        "open_count": by_group.get("backlog", 0) + by_group.get("unstarted", 0) + by_group.get("started", 0),
-        "completed_count": by_group.get("completed", 0),
-        "overdue_count": len([
-            i for i in issues
-            if i.due_date and str(i.due_date) < str(datetime.now(tz=UTC).date())
-            and str(states.get(str(i.state_id), IssueState()).group or "") not in ("completed", "cancelled")
-        ]),
-    })
+    return ok(
+        {
+            "total": len(issues),
+            "by_state": [{"name": k, "count": v} for k, v in by_state.items()],
+            "by_group": [{"name": k, "count": v} for k, v in by_group.items()],
+            "by_priority": [{"name": k, "count": v, "color": _priority_color(k)} for k, v in by_priority.items()],
+            "open_count": by_group.get("backlog", 0) + by_group.get("unstarted", 0) + by_group.get("started", 0),
+            "completed_count": by_group.get("completed", 0),
+            "overdue_count": len(
+                [
+                    i
+                    for i in issues
+                    if i.due_date
+                    and str(i.due_date) < str(datetime.now(tz=UTC).date())
+                    and str(states.get(str(i.state_id), IssueState()).group or "") not in ("completed", "cancelled")
+                ]
+            ),
+        }
+    )
 
 
 @router.get("/projects/{project_id}/velocity", response_model=SuccessResponse[list[Any]])
@@ -85,11 +85,13 @@ async def velocity(
             )
         )
         count = result.scalar_one()
-        data.append({
-            "week": week_start.strftime("W%W"),
-            "date": week_start.strftime("%b %d"),
-            "completed": count,
-        })
+        data.append(
+            {
+                "week": week_start.strftime("W%W"),
+                "date": week_start.strftime("%b %d"),
+                "completed": count,
+            }
+        )
 
     return ok(data)
 

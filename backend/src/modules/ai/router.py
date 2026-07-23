@@ -1,10 +1,10 @@
-from typing import Any
-"""Helix — AI Module: Router
-Integrates Ollama (primary) + Groq (fallback) for AI-native features.
-Streams responses via Server-Sent Events (SSE).
-"""
 from __future__ import annotations
 
+from typing import Any
+
+"""Helix — AI Module: Router
+Integrates Ollama (primary) + Groq (fallback) for AI-native features.
+"""
 import json
 from collections.abc import AsyncIterator
 from uuid import UUID
@@ -23,6 +23,7 @@ router = APIRouter(prefix="/ai", tags=["AI"])
 
 
 # ── Schemas ────────────────────────────────────────────────────────────────────
+
 
 class ChatMessage(BaseModel):
     role: str  # "user" | "assistant" | "system"
@@ -43,9 +44,11 @@ class IssueGenerateRequest(BaseModel):
 
 # ── Client helpers ─────────────────────────────────────────────────────────────
 
+
 async def _ollama_stream(messages: list[dict[str, Any]], model: str) -> AsyncIterator[str]:
     """Stream from local Ollama instance."""
     import httpx
+
     payload = {"model": model, "messages": messages, "stream": True}
     url = f"{settings.OLLAMA_BASE_URL}/api/chat"
     async with httpx.AsyncClient(timeout=120) as client:
@@ -66,13 +69,11 @@ async def _ollama_stream(messages: list[dict[str, Any]], model: str) -> AsyncIte
 async def _groq_stream(messages: list[dict[str, Any]], model: str) -> AsyncIterator[str]:
     """Stream from Groq API as fallback."""
     import httpx
+
     headers = {"Authorization": f"Bearer {settings.GROQ_API_KEY}", "Content-Type": "application/json"}
     payload = {"model": model, "messages": messages, "stream": True}
     async with httpx.AsyncClient(timeout=60) as client:
-        async with client.stream(
-            "POST", "https://api.groq.com/openai/v1/chat/completions",
-            headers=headers, json=payload
-        ) as resp:
+        async with client.stream("POST", "https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload) as resp:
             async for line in resp.aiter_lines():
                 if line.startswith("data: "):
                     raw = line[6:]
@@ -91,6 +92,7 @@ async def _groq_stream(messages: list[dict[str, Any]], model: str) -> AsyncItera
 async def _complete_text(prompt: str, system: str = "") -> str:
     """Non-streaming completion using Ollama, fallback to Groq."""
     import httpx
+
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
@@ -124,6 +126,7 @@ async def _complete_text(prompt: str, system: str = "") -> str:
 
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
+
 
 @router.post("/chat", summary="Streaming AI chat (SSE)")
 async def chat(request: ChatRequest, current_user_id: CurrentUserID) -> Any:
@@ -175,18 +178,12 @@ async def summarize_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DB
     """Generate a concise summary of an issue including its comments."""
     from src.modules.issues.models import Issue
 
-    result = await db.execute(
-        select(Issue)
-        .where(Issue.id == issue_id)
-        .options(selectinload(Issue.comments))
-    )
+    result = await db.execute(select(Issue).where(Issue.id == issue_id).options(selectinload(Issue.comments)))
     issue = result.scalar_one_or_none()
     if not issue:
         raise HTTPException(status_code=404, detail="Issue not found")
 
-    comments_text = "\n".join(
-        f"- {c.content}" for c in getattr(issue, "comments", [])
-    ) or "No comments."
+    comments_text = "\n".join(f"- {c.content}" for c in getattr(issue, "comments", [])) or "No comments."
 
     prompt = (
         f"Summarize this project issue in 2-3 sentences:\n\n"
@@ -219,6 +216,7 @@ async def generate_issues(request: IssueGenerateRequest, current_user_id: Curren
 
     # Parse JSON from response
     import re
+
     match = re.search(r"\[.*\]", raw, re.DOTALL)
     if not match:
         raise HTTPException(status_code=422, detail="AI returned malformed response. Try rephrasing.")
@@ -243,9 +241,7 @@ async def suggest_labels(issue_id: UUID, current_user_id: CurrentUserID, db: DBS
         raise HTTPException(status_code=404, detail="Issue not found")
 
     # Get project labels to suggest from
-    labels_result = await db.execute(
-        select(Label).where(Label.project_id == issue.project_id)
-    )
+    labels_result = await db.execute(select(Label).where(Label.project_id == issue.project_id))
     labels = labels_result.scalars().all()
     label_names = [l.name for l in labels]
 

@@ -1,4 +1,5 @@
 from typing import Any
+
 """Helix — Organizations Module: Schemas"""
 
 from pydantic import BaseModel, Field, field_validator
@@ -45,4 +46,3 @@ class AddMemberRequest(BaseModel):
 
 class UpdateMemberRoleRequest(BaseModel):
     role: str
-

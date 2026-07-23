@@ -90,24 +90,26 @@ class IssueService:
         await self._db.flush()
 
         # Add assignees
-        for uid_str in (data.assignee_ids or []):
+        for uid_str in data.assignee_ids or []:
             self._db.add(IssueAssignee(issue_id=issue.id, user_id=uuid.UUID(uid_str)))
 
         # Add labels
-        for lid_str in (data.label_ids or []):
+        for lid_str in data.label_ids or []:
             self._db.add(IssueLabelLink(issue_id=issue.id, label_id=uuid.UUID(lid_str)))
 
         await self._db.flush()
 
         # Log activity
-        self._db.add(Activity(
-            issue_id=issue.id,
-            actor_id=created_by,
-            field="title",
-            old_value=None,
-            new_value=data.title,
-            activity_type="created",
-        ))
+        self._db.add(
+            Activity(
+                issue_id=issue.id,
+                actor_id=created_by,
+                field="title",
+                old_value=None,
+                new_value=data.title,
+                activity_type="created",
+            )
+        )
         await self._db.flush()
 
         return await self.get_by_id(issue.id)
@@ -150,13 +152,9 @@ class IssueService:
         if filters.priority:
             query = query.where(Issue.priority.in_(filters.priority))
         if filters.assignee_ids:
-            query = query.join(IssueAssignee).where(
-                IssueAssignee.user_id.in_([uuid.UUID(a) for a in filters.assignee_ids])
-            )
+            query = query.join(IssueAssignee).where(IssueAssignee.user_id.in_([uuid.UUID(a) for a in filters.assignee_ids]))
         if filters.label_ids:
-            query = query.join(IssueLabelLink).where(
-                IssueLabelLink.label_id.in_([uuid.UUID(l) for l in filters.label_ids])
-            )
+            query = query.join(IssueLabelLink).where(IssueLabelLink.label_id.in_([uuid.UUID(l) for l in filters.label_ids]))
         if filters.parent_id:
             query = query.where(Issue.parent_id == uuid.UUID(filters.parent_id))
         elif not filters.parent_id:
@@ -179,11 +177,7 @@ class IssueService:
         query = query.order_by(order_col.desc() if desc else order_col.asc())
 
         # Count
-        count_query = select(func.count()).select_from(
-            select(Issue.id)
-            .where(Issue.project_id == project_id, Issue.deleted_at.is_(None))
-            .subquery()
-        )
+        count_query = select(func.count()).select_from(select(Issue.id).where(Issue.project_id == project_id, Issue.deleted_at.is_(None)).subquery())
         total_result = await self._db.execute(count_query)
         total = total_result.scalar_one()
 
@@ -215,20 +209,20 @@ class IssueService:
             if field in trackable:
                 old_val = getattr(issue, field, None)
                 if str(old_val) != str(new_val):
-                    activities.append(Activity(
-                        issue_id=issue_id,
-                        actor_id=updated_by,
-                        field=field,
-                        old_value=str(old_val) if old_val is not None else None,
-                        new_value=str(new_val),
-                        activity_type="updated",
-                    ))
+                    activities.append(
+                        Activity(
+                            issue_id=issue_id,
+                            actor_id=updated_by,
+                            field=field,
+                            old_value=str(old_val) if old_val is not None else None,
+                            new_value=str(new_val),
+                            activity_type="updated",
+                        )
+                    )
 
         if updates:
             updates["updated_by"] = updated_by
-            await self._db.execute(
-                update(Issue).where(Issue.id == issue_id).values(**updates)
-            )
+            await self._db.execute(update(Issue).where(Issue.id == issue_id).values(**updates))
 
         # Update assignees
         if assignee_ids is not None:
@@ -276,19 +270,19 @@ class IssueService:
         self._db.add(comment)
 
         # Log activity
-        self._db.add(Activity(
-            issue_id=issue_id,
-            actor_id=actor_id,
-            field="comment",
-            activity_type="commented",
-            comment=data.content[:200],
-        ))
+        self._db.add(
+            Activity(
+                issue_id=issue_id,
+                actor_id=actor_id,
+                field="comment",
+                activity_type="commented",
+                comment=data.content[:200],
+            )
+        )
         await self._db.flush()
         return comment
 
-    async def update_comment(
-        self, comment_id: uuid.UUID, data: CommentUpdate, actor_id: uuid.UUID
-    ) -> Comment:
+    async def update_comment(self, comment_id: uuid.UUID, data: CommentUpdate, actor_id: uuid.UUID) -> Comment:
         await self._db.execute(
             update(Comment)
             .where(Comment.id == comment_id)
@@ -306,19 +300,12 @@ class IssueService:
         await self._db.execute(delete(Comment).where(Comment.id == comment_id))
 
     async def get_comments(self, issue_id: uuid.UUID) -> list[Comment]:
-        result = await self._db.execute(
-            select(Comment)
-            .where(Comment.issue_id == issue_id)
-            .order_by(Comment.created_at.asc())
-        )
+        result = await self._db.execute(select(Comment).where(Comment.issue_id == issue_id).order_by(Comment.created_at.asc()))
         return list(result.scalars().all())
 
     async def get_activities(self, issue_id: uuid.UUID) -> list[Activity]:
         result = await self._db.execute(
-            select(Activity)
-            .where(Activity.issue_id == issue_id)
-            .options(selectinload(Activity.actor))
-            .order_by(Activity.created_at.asc())
+            select(Activity).where(Activity.issue_id == issue_id).options(selectinload(Activity.actor)).order_by(Activity.created_at.asc())
         )
         return list(result.scalars().all())
 
@@ -360,8 +347,5 @@ class IssueService:
         )
 
     async def get_attachments(self, issue_id: uuid.UUID) -> list[Attachment]:
-        result = await self._db.execute(
-            select(Attachment).where(Attachment.issue_id == issue_id)
-            .order_by(Attachment.created_at.desc())
-        )
+        result = await self._db.execute(select(Attachment).where(Attachment.issue_id == issue_id).order_by(Attachment.created_at.desc()))
         return list(result.scalars().all())

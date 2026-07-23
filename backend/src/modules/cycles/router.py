@@ -1,4 +1,5 @@
 from typing import Any
+
 """Helix — Cycles Module: Router"""
 from uuid import UUID
 
@@ -58,12 +59,11 @@ async def create_cycle(
     db: DBSession,
 ) -> Any:
     # Resolve workspace_id from slug
-    ws_result = await db.execute(
-        select(Workspace).where(Workspace.slug == ws_slug, Workspace.deleted_at.is_(None))
-    )
+    ws_result = await db.execute(select(Workspace).where(Workspace.slug == ws_slug, Workspace.deleted_at.is_(None)))
     ws = ws_result.scalar_one_or_none()
     if not ws:
         from src.core.exceptions import NotFoundError
+
         raise NotFoundError("Workspace", ws_slug)
 
     svc = CycleService(db)

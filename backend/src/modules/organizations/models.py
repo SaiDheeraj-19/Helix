@@ -38,9 +38,7 @@ class Organization(HelixBase, Base):
     """
 
     __tablename__ = "organizations"
-    __table_args__ = (
-        Index("ix_orgs_slug_active", "slug", postgresql_where="deleted_at IS NULL"),
-    )
+    __table_args__ = (Index("ix_orgs_slug_active", "slug", postgresql_where="deleted_at IS NULL"),)
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, index=True)
@@ -49,9 +47,7 @@ class Organization(HelixBase, Base):
     website: Mapped[str | None] = mapped_column(String(2048), nullable=True)
 
     # Billing
-    plan: Mapped[str] = mapped_column(
-        String(30), default=OrgPlan.FREE, nullable=False, index=True
-    )
+    plan: Mapped[str] = mapped_column(String(30), default=OrgPlan.FREE, nullable=False, index=True)
     max_members: Mapped[int] = mapped_column(default=5, nullable=False)
     max_workspaces: Mapped[int] = mapped_column(default=3, nullable=False)
     max_projects: Mapped[int] = mapped_column(default=10, nullable=False)
@@ -62,12 +58,8 @@ class Organization(HelixBase, Base):
     allow_member_invite: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     # Relationships
-    memberships: Mapped[list["OrgMembership"]] = relationship(
-        "OrgMembership", back_populates="organization", cascade="all, delete-orphan"
-    )
-    workspaces: Mapped[list["Workspace"]] = relationship(
-        "Workspace", back_populates="organization"
-    )
+    memberships: Mapped[list["OrgMembership"]] = relationship("OrgMembership", back_populates="organization", cascade="all, delete-orphan")
+    workspaces: Mapped[list["Workspace"]] = relationship("Workspace", back_populates="organization")
 
     def __repr__(self) -> str:
         return f"<Organization slug={self.slug}>"
@@ -79,9 +71,7 @@ class OrgMembership(HelixBase, Base):
     """
 
     __tablename__ = "org_memberships"
-    __table_args__ = (
-        UniqueConstraint("organization_id", "user_id", name="uq_org_membership"),
-    )
+    __table_args__ = (UniqueConstraint("organization_id", "user_id", name="uq_org_membership"),)
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -96,9 +86,7 @@ class OrgMembership(HelixBase, Base):
         index=True,
     )
     role: Mapped[str] = mapped_column(String(30), default=OrgRole.MEMBER, nullable=False)
-    invited_by: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
-    )
+    invited_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     joined_at: Mapped[uuid.UUID | None] = mapped_column(nullable=True)  # TODO: DateTime
 
     # Relationships

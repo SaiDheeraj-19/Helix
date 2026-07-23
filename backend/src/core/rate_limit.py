@@ -2,20 +2,22 @@
 Sliding window rate limiter backed by Redis.
 Limits: per-user (authenticated) or per-IP (anonymous).
 """
+
 from __future__ import annotations
 
 import hashlib
 import time
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from fastapi import FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
-from typing import Any, Callable, Awaitable
 from starlette.responses import JSONResponse
 
 # Routes with custom limits (requests per minute)
 ROUTE_LIMITS: dict[str, int] = {
-    "/api/v1/ai/": 30,           # AI endpoints — heavier compute
-    "/api/v1/auth/login": 10,    # Login — brute force protection
+    "/api/v1/ai/": 30,  # AI endpoints — heavier compute
+    "/api/v1/auth/login": 10,  # Login — brute force protection
     "/api/v1/auth/register": 5,  # Register — spam protection
 }
 DEFAULT_AUTHENTICATED_RPM = 300
@@ -57,6 +59,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         redis = self._redis
         if not redis:
             from src.infrastructure.cache.redis import get_redis_client
+
             redis = await get_redis_client()
 
         if not redis:

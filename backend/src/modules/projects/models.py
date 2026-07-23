@@ -74,32 +74,20 @@ class Project(HelixBase, AuditMixin, Base):
     icon: Mapped[str | None] = mapped_column(String(10), nullable=True)  # emoji
     color: Mapped[str] = mapped_column(String(20), default="#6366f1", nullable=False)
 
-    status: Mapped[str] = mapped_column(
-        String(30), default=ProjectStatus.ACTIVE, nullable=False, index=True
-    )
-    network: Mapped[str] = mapped_column(
-        String(20), default=ProjectNetwork.SECRET, nullable=False
-    )
+    status: Mapped[str] = mapped_column(String(30), default=ProjectStatus.ACTIVE, nullable=False, index=True)
+    network: Mapped[str] = mapped_column(String(20), default=ProjectNetwork.SECRET, nullable=False)
 
     # Issue sequence counter
     issue_sequence: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
     # Settings
-    default_assignee_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
-    )
+    default_assignee_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
 
     # Relationships
     workspace: Mapped["Workspace"] = relationship("Workspace")
-    members: Mapped[list["ProjectMember"]] = relationship(
-        "ProjectMember", back_populates="project", cascade="all, delete-orphan"
-    )
-    states: Mapped[list["IssueState"]] = relationship(
-        "IssueState", back_populates="project", cascade="all, delete-orphan"
-    )
-    labels: Mapped[list["Label"]] = relationship(
-        "Label", back_populates="project", cascade="all, delete-orphan"
-    )
+    members: Mapped[list["ProjectMember"]] = relationship("ProjectMember", back_populates="project", cascade="all, delete-orphan")
+    states: Mapped[list["IssueState"]] = relationship("IssueState", back_populates="project", cascade="all, delete-orphan")
+    labels: Mapped[list["Label"]] = relationship("Label", back_populates="project", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<Project identifier={self.identifier} name={self.name}>"
@@ -109,16 +97,10 @@ class ProjectMember(HelixBase, Base):
     """Members of a project with their roles."""
 
     __tablename__ = "project_members"
-    __table_args__ = (
-        UniqueConstraint("project_id", "user_id", name="uq_project_member"),
-    )
+    __table_args__ = (UniqueConstraint("project_id", "user_id", name="uq_project_member"),)
 
-    project_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
-    )
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
-    )
+    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     role: Mapped[str] = mapped_column(String(30), default=ProjectRole.MEMBER, nullable=False)
 
     project: Mapped["Project"] = relationship("Project", back_populates="members")
@@ -137,12 +119,8 @@ class IssueState(HelixBase, Base):
         Index("ix_states_project", "project_id"),
     )
 
-    project_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
-    )
-    workspace_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False
-    )
+    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     color: Mapped[str] = mapped_column(String(20), default="#6366f1", nullable=False)
     group: Mapped[str] = mapped_column(
@@ -167,17 +145,11 @@ class Label(HelixBase, Base):
         Index("ix_labels_project", "project_id"),
     )
 
-    project_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
-    )
-    workspace_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False
-    )
+    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     color: Mapped[str] = mapped_column(String(20), default="#6366f1", nullable=False)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    parent_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("labels.id", ondelete="SET NULL"), nullable=True
-    )
+    parent_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("labels.id", ondelete="SET NULL"), nullable=True)
 
     project: Mapped["Project"] = relationship("Project", back_populates="labels")

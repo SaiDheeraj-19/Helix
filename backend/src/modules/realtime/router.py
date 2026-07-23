@@ -1,4 +1,5 @@
 from typing import Any
+
 """Helix — WebSocket Router"""
 import structlog
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect

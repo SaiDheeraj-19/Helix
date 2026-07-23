@@ -1,4 +1,5 @@
 """Helix — Notifications Module: Models"""
+
 from enum import Enum as PyEnum
 from typing import TYPE_CHECKING
 from uuid import UUID as UUIDType
@@ -27,6 +28,7 @@ class InAppNotification(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     In-app notification record per user.
     Read/unread status tracked per notification.
     """
+
     __tablename__ = "notifications"
 
     user_id: Mapped[UUIDType] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)

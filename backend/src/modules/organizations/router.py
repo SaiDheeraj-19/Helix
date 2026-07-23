@@ -1,4 +1,5 @@
 from typing import Any
+
 """Helix — Organizations Module: Router (stub)"""
 from uuid import UUID
 
@@ -38,15 +39,17 @@ async def list_members(slug: str, current_user_id: CurrentUserID, db: DBSession)
     members = await service.get_members(slug)
     result = []
     for m in members:
-        result.append(OrgMemberResponse(
-            id=str(m.id),
-            user_id=str(m.user_id),
-            display_name=m.user.display_name,
-            email=m.user.email,
-            avatar_url=m.user.avatar_url,
-            role=m.role.value,
-            joined_at=m.created_at.isoformat()
-        ))
+        result.append(
+            OrgMemberResponse(
+                id=str(m.id),
+                user_id=str(m.user_id),
+                display_name=m.user.display_name,
+                email=m.user.email,
+                avatar_url=m.user.avatar_url,
+                role=m.role.value,
+                joined_at=m.created_at.isoformat(),
+            )
+        )
     return ok(result)
 
 
@@ -54,22 +57,34 @@ async def list_members(slug: str, current_user_id: CurrentUserID, db: DBSession)
 async def add_member(slug: str, data: AddMemberRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = OrgService(db)
     m = await service.add_member(slug, data.email, data.role)
-    return ok(OrgMemberResponse(
-        id=str(m.id), user_id=str(m.user_id), display_name=m.user.display_name,
-        email=m.user.email, avatar_url=m.user.avatar_url, role=m.role.value,
-        joined_at=m.created_at.isoformat()
-    ))
+    return ok(
+        OrgMemberResponse(
+            id=str(m.id),
+            user_id=str(m.user_id),
+            display_name=m.user.display_name,
+            email=m.user.email,
+            avatar_url=m.user.avatar_url,
+            role=m.role.value,
+            joined_at=m.created_at.isoformat(),
+        )
+    )
 
 
 @router.patch("/{slug}/members/{membership_id}", response_model=SuccessResponse[OrgMemberResponse])
 async def update_member(slug: str, membership_id: UUID, data: UpdateMemberRoleRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = OrgService(db)
     m = await service.update_member_role(slug, membership_id, data.role)
-    return ok(OrgMemberResponse(
-        id=str(m.id), user_id=str(m.user_id), display_name=m.user.display_name,
-        email=m.user.email, avatar_url=m.user.avatar_url, role=m.role.value,
-        joined_at=m.created_at.isoformat()
-    ))
+    return ok(
+        OrgMemberResponse(
+            id=str(m.id),
+            user_id=str(m.user_id),
+            display_name=m.user.display_name,
+            email=m.user.email,
+            avatar_url=m.user.avatar_url,
+            role=m.role.value,
+            joined_at=m.created_at.isoformat(),
+        )
+    )
 
 
 @router.delete("/{slug}/members/{membership_id}", status_code=status.HTTP_204_NO_CONTENT)

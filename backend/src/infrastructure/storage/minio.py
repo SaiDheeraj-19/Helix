@@ -129,11 +129,7 @@ class StorageService:
         if filename:
             params["ResponseContentDisposition"] = f'attachment; filename="{filename}"'
 
-        return str(
-            self._client.generate_presigned_url(
-                "get_object", Params=params, ExpiresIn=expires_in
-            )
-        )
+        return str(self._client.generate_presigned_url("get_object", Params=params, ExpiresIn=expires_in))
 
     def delete_file(self, bucket: str, key: str) -> None:
         """Delete a file from storage."""

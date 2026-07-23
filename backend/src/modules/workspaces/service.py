@@ -1,4 +1,5 @@
 """Helix — Workspaces Module: Service"""
+
 from uuid import UUID
 
 from slugify import slugify

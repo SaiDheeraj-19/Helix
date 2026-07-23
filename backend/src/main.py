@@ -34,8 +34,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Initialize MinIO buckets
     from src.infrastructure.storage.minio import init_minio
-    await init_minio()
 
+    await init_minio()
 
     logger.info("helix_ready")
     yield
@@ -135,7 +135,8 @@ def _register_routers(app: FastAPI) -> None:
         t0 = time.monotonic()
         try:
             import redis.asyncio as aioredis
-            r = aioredis.from_url(s.redis_url_str, socket_connect_timeout=2) # type: ignore
+
+            r = aioredis.from_url(s.redis_url_str, socket_connect_timeout=2)  # type: ignore
             await r.ping()
             await r.aclose()
             checks["redis"] = {"status": "ok", "latency_ms": round((time.monotonic() - t0) * 1000, 1)}
@@ -146,6 +147,7 @@ def _register_routers(app: FastAPI) -> None:
         t0 = time.monotonic()
         try:
             from src.infrastructure.storage.minio import StorageService
+
             storage = StorageService()
             # List buckets as a liveness probe
             storage._client.list_buckets()

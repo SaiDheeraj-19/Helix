@@ -1,7 +1,9 @@
 """Helix — Issues Module: Schemas"""
+
 from pydantic import BaseModel, Field
 
 # ─── Nested ────────────────────────────────────────────────────────────────────
+
 
 class StateSlim(BaseModel):
     id: str
@@ -28,12 +30,13 @@ class LabelSlim(BaseModel):
 
 # ─── Issue ─────────────────────────────────────────────────────────────────────
 
+
 class IssueCreate(BaseModel):
     title: str = Field(min_length=1, max_length=500)
     description: str | None = None
     description_html: str | None = None
     priority: str = Field("none")
-    state_id: str | None = None   # uses project default if None
+    state_id: str | None = None  # uses project default if None
     assignee_ids: list[str] = Field(default_factory=list)
     label_ids: list[str] = Field(default_factory=list)
     parent_id: str | None = None
@@ -92,17 +95,19 @@ class IssueFilters(BaseModel):
     assignee_ids: list[str] = Field(default_factory=list)
     label_ids: list[str] = Field(default_factory=list)
     search: str | None = None
-    parent_id: str | None = None   # filter by subtasks
-    order_by: str = Field("-created_at")   # prefix - for DESC
+    parent_id: str | None = None  # filter by subtasks
+    order_by: str = Field("-created_at")  # prefix - for DESC
 
 
 class IssueMoveRequest(BaseModel):
     """Reorder/move an issue in the board."""
+
     state_id: str
     sort_order: float
 
 
 # ─── Comment ───────────────────────────────────────────────────────────────────
+
 
 class CommentCreate(BaseModel):
     content: str = Field(min_length=1)
@@ -129,6 +134,7 @@ class CommentResponse(BaseModel):
 
 # ─── Activity ──────────────────────────────────────────────────────────────────
 
+
 class ActivityResponse(BaseModel):
     id: str
     issue_id: str
@@ -144,6 +150,7 @@ class ActivityResponse(BaseModel):
 
 
 # ─── Attachment ────────────────────────────────────────────────────────────────
+
 
 class AttachmentUploadRequest(BaseModel):
     file_name: str = Field(min_length=1, max_length=500)

@@ -43,6 +43,7 @@ GITHUB_EMAILS_URL = "https://api.github.com/user/emails"
 # State helpers (simple CSRF protection)
 # ─────────────────────────────────────────────
 
+
 def generate_state() -> str:
     """Generate a cryptographically secure random state token."""
     return secrets.token_urlsafe(32)
@@ -51,6 +52,7 @@ def generate_state() -> str:
 # ─────────────────────────────────────────────
 # URL builders
 # ─────────────────────────────────────────────
+
 
 def get_google_auth_url(state: str) -> str:
     """Build the Google OAuth authorization URL."""
@@ -86,6 +88,7 @@ def get_github_auth_url(state: str) -> str:
 # ─────────────────────────────────────────────
 # Token exchange helpers
 # ─────────────────────────────────────────────
+
 
 async def exchange_google_code(code: str) -> dict[str, Any]:
     """Exchange an authorization code for Google tokens and return userinfo."""
@@ -175,9 +178,11 @@ async def exchange_github_code(code: str) -> dict[str, Any]:
 # OAuth user upsert (find or create)
 # ─────────────────────────────────────────────
 
+
 def _slugify_username(raw: str) -> str:
     """Turn an arbitrary string into a valid lowercase username."""
     import re
+
     slug = re.sub(r"[^a-zA-Z0-9_-]", "_", raw).lower().strip("_-")
     return slug[:30] or "user"
 
@@ -220,10 +225,7 @@ async def find_or_create_oauth_user(
 
     # 3. Create a brand new user
     if not email:
-        raise UnauthorizedError(
-            f"Could not retrieve a verified email from {provider}. "
-            "Please ensure your account has a public or verified email."
-        )
+        raise UnauthorizedError(f"Could not retrieve a verified email from {provider}. " "Please ensure your account has a public or verified email.")
 
     # Build a unique username from display name or email
     base_username = _slugify_username(display_name or email.split("@")[0])
@@ -259,6 +261,7 @@ async def find_or_create_oauth_user(
 # ─────────────────────────────────────────────
 # Issue tokens for an OAuth user
 # ─────────────────────────────────────────────
+
 
 async def issue_tokens_for_user(
     repo: AuthRepository,
