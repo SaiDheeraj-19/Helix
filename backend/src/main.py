@@ -40,6 +40,30 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     from src.infrastructure.realtime.redis_pubsub import start_redis_listener, stop_redis_listener
     start_redis_listener()
 
+    # Seed Default Organization and Workspace
+    from src.infrastructure.database.core import async_session_maker
+    from src.modules.organizations.models import Organization
+    from src.modules.workspaces.models import Workspace
+    from sqlalchemy import select
+
+    async with async_session_maker() as session:
+        # Create default organization if it doesn't exist
+        result = await session.execute(select(Organization).where(Organization.slug == "default"))
+        org = result.scalar_one_or_none()
+        if not org:
+            org = Organization(name="Default Organization", slug="default", description="Global default organization")
+            session.add(org)
+            await session.flush()
+        
+        # Create default workspace if it doesn't exist
+        result = await session.execute(select(Workspace).where(Workspace.slug == "default"))
+        ws = result.scalar_one_or_none()
+        if not ws:
+            ws = Workspace(organization_id=org.id, name="Default Workspace", slug="default", description="Global default workspace")
+            session.add(ws)
+            
+        await session.commit()
+
     logger.info("helix_ready")
     yield
 
