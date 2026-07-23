@@ -34,7 +34,7 @@ export default function WorkspaceMembersPage() {
       setInviteOpen(false);
       setInviteEmail("");
     },
-    onError: (e: any) => toast.error(e?.response?.data?.errors?.message || e?.response?.data?.detail || "Failed to invite member"),
+    onError: (e: any) => toast.error(e?.message || "Failed to invite member"),
   });
 
   const updateRoleMutation = useMutation({
