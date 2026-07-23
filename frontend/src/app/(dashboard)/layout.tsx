@@ -8,6 +8,7 @@ import { useUIStore } from "@/store/ui.store";
 import { AppSidebar } from "@/components/common/AppSidebar";
 import { AppTopbar } from "@/components/common/AppTopbar";
 import { CommandPalette } from "@/components/common/CommandPalette";
+import { CreateIssueModal } from "@/components/issues/CreateIssueModal";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -113,6 +114,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* ── Command Palette ──────────────────────────────── */}
       <CommandPalette />
+
+      {/* ── Create Issue Modal ───────────────────────────── */}
+      <CreateIssueModal />
     </div>
   );
 }

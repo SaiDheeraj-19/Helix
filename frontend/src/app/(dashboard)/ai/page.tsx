@@ -113,12 +113,12 @@ export default function AIAssistantPage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#090909] text-white">
+    <div className="flex flex-col h-full bg-background text-foreground">
       {/* Header */}
-      <div className="flex items-center justify-between px-8 h-16 border-b border-[rgba(255,255,255,0.04)] flex-shrink-0">
+      <div className="flex items-center justify-between px-8 h-16 border-b border-border flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded flex items-center justify-center bg-[linear-gradient(135deg,rgba(139,92,246,0.1),rgba(59,130,246,0.1))] border border-[rgba(139,92,246,0.2)]">
-            <Sparkles className="w-3.5 h-3.5 text-[#8B5CF6]" />
+          <div className="w-6 h-6 rounded flex items-center justify-center bg-[linear-gradient(135deg,rgba(139,92,246,0.1),rgba(59,130,246,0.1))] border border-primary/20">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
           </div>
           <div>
             <h1 className="text-[15px] font-medium tracking-tight">Helix Intelligence</h1>
@@ -126,7 +126,7 @@ export default function AIAssistantPage() {
         </div>
         <button
           onClick={() => setMessages([])}
-          className="text-[12px] font-medium text-white/40 hover:text-white/80 transition-colors"
+          className="text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           Clear Context
         </button>
@@ -137,10 +137,10 @@ export default function AIAssistantPage() {
         <div className="max-w-[720px] mx-auto min-h-full flex flex-col">
           {messages.length === 0 ? (
             <div className="flex-1 flex flex-col justify-center pb-24">
-              <h2 className="text-[28px] font-medium tracking-tight mb-2 text-white/90">
+              <h2 className="text-[28px] font-medium tracking-tight mb-2 text-foreground">
                 How can I help, {user?.display_name?.split(" ")[0] || "there"}?
               </h2>
-              <p className="text-[15px] text-white/40 mb-10">
+              <p className="text-[15px] text-muted-foreground mb-10">
                 I can analyze issues, write specs, or query workspace metrics.
               </p>
               
@@ -149,12 +149,12 @@ export default function AIAssistantPage() {
                   <button
                     key={prompt}
                     onClick={() => sendMessage(prompt)}
-                    className="flex items-center justify-between p-4 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[#111] hover:bg-[#151515] hover:border-[rgba(255,255,255,0.12)] transition-all group text-left"
+                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-card hover:bg-muted hover:border-border/80 transition-all group text-left"
                   >
-                    <span className="text-[14px] text-white/70 group-hover:text-white transition-colors">
+                    <span className="text-[14px] text-muted-foreground group-hover:text-foreground transition-colors">
                       {prompt}
                     </span>
-                    <ArrowRight className="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors" />
+                    <ArrowRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-foreground/60 transition-colors" />
                   </button>
                 ))}
               </div>
@@ -172,20 +172,20 @@ export default function AIAssistantPage() {
                       m.role === "user" ? "flex-row" : "flex-row"
                     )}
                   >
-                    <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center mt-1 text-[10px] font-mono font-bold uppercase tracking-wider text-white/30">
+                    <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center mt-1 text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground">
                       {m.role === "user" ? "USR" : "HLX"}
                     </div>
                     
                     <div className="flex-1 text-[15px] leading-relaxed font-medium">
                       {m.role === "user" ? (
-                        <div className="text-white/90">
+                        <div className="text-foreground">
                           {m.content}
                         </div>
                       ) : (
-                        <div className="text-white/70 prose prose-invert prose-p:leading-relaxed prose-pre:bg-[#111] prose-pre:border prose-pre:border-[rgba(255,255,255,0.1)]">
+                        <div className="text-foreground/80 prose dark:prose-invert prose-p:leading-relaxed prose-pre:bg-muted prose-pre:border prose-pre:border-border">
                           {m.content}
                           {m.streaming && (
-                            <span className="inline-block w-2 h-4 bg-[#8B5CF6] ml-1 animate-pulse align-middle" />
+                            <span className="inline-block w-2 h-4 bg-primary ml-1 animate-pulse align-middle" />
                           )}
                         </div>
                       )}
@@ -199,7 +199,7 @@ export default function AIAssistantPage() {
       </div>
 
       {/* Input Area */}
-      <div className="px-8 py-6 bg-[#090909]">
+      <div className="px-8 py-6 bg-background">
         <div className="max-w-[720px] mx-auto relative group">
           <textarea
             ref={inputRef}
@@ -208,7 +208,7 @@ export default function AIAssistantPage() {
             onKeyDown={handleKeyDown}
             placeholder="Ask Helix..."
             rows={1}
-            className="w-full bg-[#111] border border-[rgba(255,255,255,0.06)] rounded-xl px-5 py-4 pr-16 text-[15px] text-white placeholder-white/30 focus:outline-none focus:border-[rgba(255,255,255,0.15)] resize-none transition-all shadow-sm"
+            className="w-full bg-card border border-border rounded-xl px-5 py-4 pr-16 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border/80 resize-none transition-all shadow-sm"
             style={{ minHeight: "56px", maxHeight: "200px" }}
           />
           
@@ -216,7 +216,7 @@ export default function AIAssistantPage() {
             {isStreaming ? (
               <button
                 onClick={() => abortRef.current?.abort()}
-                className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/10 text-white/40 transition-colors"
+                className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground transition-colors"
               >
                 <StopCircle className="w-4 h-4" />
               </button>
@@ -224,7 +224,7 @@ export default function AIAssistantPage() {
               <button
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim()}
-                className="w-9 h-9 flex items-center justify-center rounded-lg bg-white text-black hover:bg-gray-200 disabled:opacity-50 disabled:bg-[#222] disabled:text-white/30 transition-colors"
+                className="w-9 h-9 flex items-center justify-center rounded-lg bg-foreground text-background hover:opacity-90 disabled:opacity-50 disabled:bg-muted disabled:text-muted-foreground transition-colors"
               >
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -232,7 +232,7 @@ export default function AIAssistantPage() {
           </div>
         </div>
         <div className="text-center mt-3">
-          <p className="text-[11px] font-mono text-white/20 tracking-tight">Helix AI can make mistakes. Verify critical code and metrics.</p>
+          <p className="text-[11px] font-mono text-muted-foreground tracking-tight">Helix AI can make mistakes. Verify critical code and metrics.</p>
         </div>
       </div>
     </div>
