@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 
 export function PremiumLoader() {
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/60 backdrop-blur-2xl">
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm">
       <div className="relative flex items-center justify-center">
         {/* Subtle background glow */}
-        <div className="absolute w-32 h-32 bg-foreground/5 rounded-full blur-2xl" />
+        <div className="absolute w-32 h-32 bg-foreground/5 rounded-full blur-xl" />
 
         {/* Outer rotating ring - Apple inspired smoothness */}
         <motion.svg

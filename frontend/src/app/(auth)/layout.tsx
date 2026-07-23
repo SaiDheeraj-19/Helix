@@ -32,63 +32,30 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="w-full h-full rounded-[40px] overflow-hidden relative shadow-2xl"
           style={{
-            background: "linear-gradient(135deg, #f5ecd5 0%, #e8c68c 30%, #4facfe 70%, #fdfbfb 100%)",
+            background: "linear-gradient(-45deg, #f5ecd5, #e8c68c, #4facfe, #fdfbfb)",
+            backgroundSize: "400% 400%",
           }}
         >
-          {/* Abstract fluid shapes using blur */}
-          <motion.div 
-            animate={{
-              x: ["0%", "10%", "-5%", "0%"],
-              y: ["0%", "-10%", "5%", "0%"],
-              scale: [1, 1.1, 0.9, 1],
-            }}
-            transition={{ duration: 15, ease: "easeInOut", repeat: Infinity }}
-            className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-blue-500/40 blur-[100px] rounded-full mix-blend-multiply" 
-          />
-          <motion.div 
-            animate={{
-              x: ["0%", "-15%", "10%", "0%"],
-              y: ["0%", "15%", "-10%", "0%"],
-              scale: [1, 0.85, 1.15, 1],
-            }}
-            transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, delay: 2 }}
-            className="absolute top-[20%] right-[-20%] w-[80%] h-[80%] bg-orange-300/60 blur-[120px] rounded-full mix-blend-multiply" 
-          />
-          <motion.div 
-            animate={{
-              x: ["0%", "20%", "-15%", "0%"],
-              y: ["0%", "-10%", "15%", "0%"],
-              scale: [1, 1.2, 0.8, 1],
-            }}
-            transition={{ duration: 20, ease: "easeInOut", repeat: Infinity, delay: 4 }}
-            className="absolute bottom-[-20%] left-[10%] w-[60%] h-[60%] bg-amber-200/50 blur-[90px] rounded-full mix-blend-multiply" 
-          />
+          {/* Lightweight CSS animation instead of heavy JS/WebGL/SVG blurs */}
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes gradientMove {
+              0% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+              100% { background-position: 0% 50%; }
+            }
+          `}} />
           
-          {/* React Bits: Line Waves */}
-          <div className="absolute inset-0 z-0 opacity-80 mix-blend-overlay">
-            <LineWaves
-              speed={0.3}
-              innerLineCount={32}
-              outerLineCount={36}
-              warpIntensity={1.0}
-              rotation={-45}
-              edgeFadeWidth={0.0}
-              colorCycleSpeed={1.0}
-              brightness={1.0}
-              color1="#ffffff"
-              color2="#fdfbfb"
-              color3="#ffffff"
-              enableMouseInteraction={true}
-              mouseInfluence={2.0}
-            />
-          </div>
-          
-          {/* Noise overlay */}
           <div 
-            className="absolute inset-0 opacity-[0.3]"
+            className="absolute inset-0"
+            style={{ animation: "gradientMove 15s ease infinite" }}
+          />
+
+          {/* Simple lightweight noise overlay */}
+          <div 
+            className="absolute inset-0 opacity-[0.2]"
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-              backgroundSize: "256px",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+              backgroundSize: "200px",
             }}
           />
         </motion.div>
