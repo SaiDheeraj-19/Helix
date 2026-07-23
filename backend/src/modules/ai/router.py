@@ -10,14 +10,14 @@ from collections.abc import AsyncIterator
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import ORJSONResponse, StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from src.core.config import settings
 from src.core.dependencies import CurrentUserID, DBSession
-from src.core.response import SuccessResponse, ok
+from src.core.response import ok_json
 
 router = APIRouter(prefix="/ai", tags=["AI"])
 
@@ -149,7 +149,7 @@ async def chat(request: ChatRequest, current_user_id: CurrentUserID) -> Any:
 
     if not request.stream:
         content = await _complete_text(messages[-1]["content"])
-        return ok({"content": content})
+        return ORJSONResponse(content=ok_json({"content": content}))
 
     async def event_stream() -> Any:
         try:
@@ -173,8 +173,8 @@ async def chat(request: ChatRequest, current_user_id: CurrentUserID) -> Any:
     )
 
 
-@router.post("/issues/{issue_id}/summarize", response_model=SuccessResponse[dict[str, Any]])
-async def summarize_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.post("/issues/{issue_id}/summarize")
+async def summarize_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     """Generate a concise summary of an issue including its comments."""
     from src.modules.issues.models import Issue
 
@@ -195,11 +195,11 @@ async def summarize_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DB
     )
 
     summary = await _complete_text(prompt)
-    return ok({"summary": summary, "issue_id": str(issue_id)})
+    return ORJSONResponse(content=ok_json({"summary": summary, "issue_id": str(issue_id)}))
 
 
-@router.post("/issues/generate", response_model=SuccessResponse[list[Any]])
-async def generate_issues(request: IssueGenerateRequest, current_user_id: CurrentUserID) -> Any:
+@router.post("/issues/generate")
+async def generate_issues(request: IssueGenerateRequest, current_user_id: CurrentUserID) -> ORJSONResponse:
     """
     Generate a list of actionable issues from a natural language feature description.
     """
@@ -226,11 +226,11 @@ async def generate_issues(request: IssueGenerateRequest, current_user_id: Curren
     except json.JSONDecodeError:
         raise HTTPException(status_code=422, detail="Could not parse AI response as JSON.")
 
-    return ok(issues)
+    return ORJSONResponse(content=ok_json(issues))
 
 
-@router.post("/issues/{issue_id}/suggest-labels", response_model=SuccessResponse[list[Any]])
-async def suggest_labels(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.post("/issues/{issue_id}/suggest-labels")
+async def suggest_labels(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     """Suggest labels for an issue based on its title and description."""
     from src.modules.issues.models import Issue
     from src.modules.projects.models import Label
@@ -243,10 +243,10 @@ async def suggest_labels(issue_id: UUID, current_user_id: CurrentUserID, db: DBS
     # Get project labels to suggest from
     labels_result = await db.execute(select(Label).where(Label.project_id == issue.project_id))
     labels = labels_result.scalars().all()
-    label_names = [l.name for l in labels]
+    label_names = [lbl.name for lbl in labels]
 
     if not label_names:
-        return ok([])
+        return ORJSONResponse(content=ok_json([]))
 
     prompt = (
         f"Given these available labels: {', '.join(label_names)}\n\n"
@@ -260,12 +260,12 @@ async def suggest_labels(issue_id: UUID, current_user_id: CurrentUserID, db: DBS
     raw = await _complete_text(prompt)
     match = __import__("re").search(r"\[.*?\]", raw, __import__("re").DOTALL)
     if not match:
-        return ok([])
+        return ORJSONResponse(content=ok_json([]))
 
     try:
         suggested = json.loads(match.group())
         # Validate against real labels
-        valid = [l for l in suggested if l in label_names]
-        return ok(valid[:3])
+        valid = [lbl for lbl in suggested if lbl in label_names]
+        return ORJSONResponse(content=ok_json(valid[:3]))
     except json.JSONDecodeError:
-        return ok([])
+        return ORJSONResponse(content=ok_json([]))

@@ -341,7 +341,7 @@ class IssueService:
         )
 
         return AttachmentUploadResponse(
-            attachment_id=str(attachment.id),
+            attachment_id=attachment.id,
             upload_url=presigned["upload_url"],
             storage_key=storage_key,
         )

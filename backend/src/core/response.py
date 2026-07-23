@@ -88,3 +88,21 @@ def paginated(
         data=data,
         meta=PaginationMeta.from_params(page, per_page, total),
     )
+
+
+def ok_json(data: Any, meta: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Create a success response as a JSON-safe dict (UUIDs serialized to strings)."""
+    return SuccessResponse(data=data, meta=meta).model_dump(mode="json")
+
+
+def paginated_json(
+    data: list[Any],
+    page: int,
+    per_page: int,
+    total: int,
+) -> dict[str, Any]:
+    """Create a paginated response as a JSON-safe dict."""
+    return PaginatedResponse(
+        data=data,
+        meta=PaginationMeta.from_params(page, per_page, total),
+    ).model_dump(mode="json")

@@ -1,12 +1,12 @@
-from typing import Any
 
-"""Helix — Organizations Module: Router (stub)"""
+"""Helix — Organizations Module: Router"""
 from uuid import UUID
 
 from fastapi import APIRouter, status
+from fastapi.responses import ORJSONResponse
 
 from src.core.dependencies import CurrentUserID, DBSession
-from src.core.response import SuccessResponse, ok
+from src.core.response import ok_json
 from src.modules.organizations.schemas import (
     AddMemberRequest,
     CreateOrgRequest,
@@ -19,70 +19,75 @@ from src.modules.organizations.service import OrgService
 router = APIRouter(prefix="/orgs", tags=["Organizations"])
 
 
-@router.post("", response_model=SuccessResponse[OrgResponse], status_code=201, summary="Create organization")
-async def create_org(data: CreateOrgRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.post("", status_code=201, summary="Create organization")
+async def create_org(data: CreateOrgRequest, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     service = OrgService(db)
     org = await service.create(data, owner_id=current_user_id)
-    return ok(OrgResponse.model_validate(org))
+    return ORJSONResponse(content=ok_json(OrgResponse.model_validate(org).model_dump(mode="json")), status_code=status.HTTP_201_CREATED)
 
 
-@router.get("/{slug}", response_model=SuccessResponse[OrgResponse], summary="Get organization by slug")
-async def get_org(slug: str, current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.get("/{slug}", summary="Get organization by slug")
+async def get_org(slug: str, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     service = OrgService(db)
     org = await service.get_by_slug(slug)
-    return ok(OrgResponse.model_validate(org))
+    return ORJSONResponse(content=ok_json(OrgResponse.model_validate(org).model_dump(mode="json")))
 
 
-@router.get("/{slug}/members", response_model=SuccessResponse[list[OrgMemberResponse]])
-async def list_members(slug: str, current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.get("/{slug}/members")
+async def list_members(slug: str, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     service = OrgService(db)
     members = await service.get_members(slug)
     result = []
     for m in members:
         result.append(
             OrgMemberResponse(
-                id=str(m.id),
-                user_id=str(m.user_id),
+                id=m.id,
+                user_id=m.user_id,
                 display_name=m.user.display_name,
                 email=m.user.email,
                 avatar_url=m.user.avatar_url,
                 role=m.role.value,
                 joined_at=m.created_at.isoformat(),
-            )
+            ).model_dump(mode="json")
         )
-    return ok(result)
+    return ORJSONResponse(content=ok_json(result))
 
 
-@router.post("/{slug}/members", response_model=SuccessResponse[OrgMemberResponse], status_code=status.HTTP_201_CREATED)
-async def add_member(slug: str, data: AddMemberRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.post("/{slug}/members", status_code=status.HTTP_201_CREATED)
+async def add_member(slug: str, data: AddMemberRequest, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     service = OrgService(db)
     m = await service.add_member(slug, data.email, data.role)
-    return ok(
-        OrgMemberResponse(
-            id=str(m.id),
-            user_id=str(m.user_id),
-            display_name=m.user.display_name,
-            email=m.user.email,
-            avatar_url=m.user.avatar_url,
-            role=m.role.value,
-            joined_at=m.created_at.isoformat(),
-        )
+    return ORJSONResponse(
+        content=ok_json(
+            OrgMemberResponse(
+                id=m.id,
+                user_id=m.user_id,
+                display_name=m.user.display_name,
+                email=m.user.email,
+                avatar_url=m.user.avatar_url,
+                role=m.role.value,
+                joined_at=m.created_at.isoformat(),
+            ).model_dump(mode="json")
+        ),
+        status_code=status.HTTP_201_CREATED,
     )
 
 
-@router.patch("/{slug}/members/{membership_id}", response_model=SuccessResponse[OrgMemberResponse])
-async def update_member(slug: str, membership_id: UUID, data: UpdateMemberRoleRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.patch("/{slug}/members/{membership_id}")
+async def update_member(slug: str, membership_id: UUID, data: UpdateMemberRoleRequest, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     service = OrgService(db)
     m = await service.update_member_role(slug, membership_id, data.role)
-    return ok(
-        OrgMemberResponse(
-            id=str(m.id),
-            user_id=str(m.user_id),
-            display_name=m.user.display_name,
-            email=m.user.email,
-            avatar_url=m.user.avatar_url,
-            role=m.role.value,
-            joined_at=m.created_at.isoformat(),
+    return ORJSONResponse(
+        content=ok_json(
+            OrgMemberResponse(
+                id=m.id,
+                user_id=m.user_id,
+                display_name=m.user.display_name,
+                email=m.user.email,
+                avatar_url=m.user.avatar_url,
+                role=m.role.value,
+                joined_at=m.created_at.isoformat(),
+            ).model_dump(mode="json")
         )
     )
 

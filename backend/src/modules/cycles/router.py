@@ -4,10 +4,11 @@ from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, status
+from fastapi.responses import ORJSONResponse
 from sqlalchemy import select
 
 from src.core.dependencies import CurrentUserID, DBSession
-from src.core.response import SuccessResponse, ok
+from src.core.response import ok_json
 from src.modules.cycles.schemas import CycleCreate, CycleIssueAdd, CycleResponse, CycleUpdate
 from src.modules.cycles.service import CycleService
 from src.modules.workspaces.models import Workspace
@@ -15,11 +16,11 @@ from src.modules.workspaces.models import Workspace
 router = APIRouter(tags=["Cycles"])
 
 
-def _serialize(cycle: Any, progress: dict[str, Any]) -> CycleResponse:
+def _serialize(cycle: Any, progress: dict[str, Any]) -> dict[str, Any]:
     return CycleResponse(
-        id=str(cycle.id),
-        project_id=str(cycle.project_id),
-        workspace_id=str(cycle.workspace_id),
+        id=cycle.id,
+        project_id=cycle.project_id,
+        workspace_id=cycle.workspace_id,
         name=cycle.name,
         description=cycle.description,
         status=cycle.status,
@@ -31,23 +32,21 @@ def _serialize(cycle: Any, progress: dict[str, Any]) -> CycleResponse:
         progress_percentage=progress["percentage"],
         created_at=cycle.created_at.isoformat(),
         created_by=str(cycle.created_by) if cycle.created_by else None,
-    )
+    ).model_dump(mode="json")
 
 
 @router.get(
     "/workspaces/{ws_slug}/projects/{project_id}/cycles",
-    response_model=SuccessResponse[list[CycleResponse]],
     summary="List all cycles in a project",
 )
-async def list_cycles(ws_slug: str, project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def list_cycles(ws_slug: str, project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     svc = CycleService(db)
     cycles = await svc.list_for_project(project_id)
-    return ok([_serialize(c, svc.compute_progress(c)) for c in cycles])
+    return ORJSONResponse(content=ok_json([_serialize(c, svc.compute_progress(c)) for c in cycles]))
 
 
 @router.post(
     "/workspaces/{ws_slug}/projects/{project_id}/cycles",
-    response_model=SuccessResponse[CycleResponse],
     status_code=status.HTTP_201_CREATED,
     summary="Create a cycle",
 )
@@ -57,7 +56,7 @@ async def create_cycle(
     data: CycleCreate,
     current_user_id: CurrentUserID,
     db: DBSession,
-) -> Any:
+) -> ORJSONResponse:
     # Resolve workspace_id from slug
     ws_result = await db.execute(select(Workspace).where(Workspace.slug == ws_slug, Workspace.deleted_at.is_(None)))
     ws = ws_result.scalar_one_or_none()
@@ -68,29 +67,30 @@ async def create_cycle(
 
     svc = CycleService(db)
     cycle = await svc.create(project_id, ws.id, data, current_user_id)
-    return ok(_serialize(cycle, svc.compute_progress(cycle)))
+    return ORJSONResponse(
+        content=ok_json(_serialize(cycle, svc.compute_progress(cycle))),
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 @router.get(
     "/cycles/{cycle_id}",
-    response_model=SuccessResponse[CycleResponse],
     summary="Get cycle detail",
 )
-async def get_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def get_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     svc = CycleService(db)
     cycle = await svc.get_by_id(cycle_id)
-    return ok(_serialize(cycle, svc.compute_progress(cycle)))
+    return ORJSONResponse(content=ok_json(_serialize(cycle, svc.compute_progress(cycle))))
 
 
 @router.patch(
     "/cycles/{cycle_id}",
-    response_model=SuccessResponse[CycleResponse],
     summary="Update a cycle",
 )
-async def update_cycle(cycle_id: UUID, data: CycleUpdate, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def update_cycle(cycle_id: UUID, data: CycleUpdate, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     svc = CycleService(db)
     cycle = await svc.update(cycle_id, data)
-    return ok(_serialize(cycle, svc.compute_progress(cycle)))
+    return ORJSONResponse(content=ok_json(_serialize(cycle, svc.compute_progress(cycle))))
 
 
 @router.delete("/cycles/{cycle_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -101,13 +101,12 @@ async def delete_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSes
 
 @router.post(
     "/cycles/{cycle_id}/issues",
-    response_model=SuccessResponse[CycleResponse],
     summary="Add issues to a cycle",
 )
-async def add_issues(cycle_id: UUID, data: CycleIssueAdd, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def add_issues(cycle_id: UUID, data: CycleIssueAdd, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     svc = CycleService(db)
     cycle = await svc.add_issues(cycle_id, data.issue_ids)
-    return ok(_serialize(cycle, svc.compute_progress(cycle)))
+    return ORJSONResponse(content=ok_json(_serialize(cycle, svc.compute_progress(cycle))))
 
 
 @router.delete("/cycles/{cycle_id}/issues/{issue_id}", status_code=status.HTTP_204_NO_CONTENT)

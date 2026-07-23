@@ -1,15 +1,15 @@
-from typing import Any
 
 """Helix — Notifications Module: Router"""
 from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, status
+from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
 from sqlalchemy import select, update
 
 from src.core.dependencies import CurrentUserID, DBSession
-from src.core.response import SuccessResponse, ok
+from src.core.response import ok_json
 from src.modules.notifications.models import InAppNotification
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
@@ -26,12 +26,12 @@ class NotificationResponse(BaseModel):
     created_at: str
 
 
-@router.get("", response_model=SuccessResponse[list[NotificationResponse]])
+@router.get("")
 async def list_notifications(
     current_user_id: CurrentUserID,
     db: DBSession,
     unread_only: bool = False,
-) -> Any:
+) -> ORJSONResponse:
     """Get all notifications for the current user."""
     query = select(InAppNotification).where(InAppNotification.user_id == current_user_id)
     if unread_only:
@@ -41,20 +41,22 @@ async def list_notifications(
     result = await db.execute(query)
     notifications = result.scalars().all()
 
-    return ok(
-        [
-            NotificationResponse(
-                id=str(n.id),
-                title=n.title,
-                message=n.message,
-                notification_type=n.notification_type,
-                entity_type=n.entity_type,
-                entity_id=str(n.entity_id) if n.entity_id else None,
-                is_read=n.is_read,
-                created_at=n.created_at.isoformat(),
-            )
-            for n in notifications
-        ]
+    return ORJSONResponse(
+        content=ok_json(
+            [
+                NotificationResponse(
+                    id=str(n.id),
+                    title=n.title,
+                    message=n.message,
+                    notification_type=n.notification_type,
+                    entity_type=n.entity_type,
+                    entity_id=str(n.entity_id) if n.entity_id else None,
+                    is_read=n.is_read,
+                    created_at=n.created_at.isoformat(),
+                ).model_dump(mode="json")
+                for n in notifications
+            ]
+        )
     )
 
 
@@ -87,8 +89,8 @@ async def mark_all_read(current_user_id: CurrentUserID, db: DBSession) -> None:
     await db.flush()
 
 
-@router.get("/unread-count", response_model=SuccessResponse[dict[str, Any]])
-async def unread_count(current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.get("/unread-count")
+async def unread_count(current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     """Get unread notification count for badge display."""
     from sqlalchemy import func
 
@@ -99,4 +101,4 @@ async def unread_count(current_user_id: CurrentUserID, db: DBSession) -> Any:
         )
     )
     count = result.scalar_one()
-    return ok({"count": count})
+    return ORJSONResponse(content=ok_json({"count": count}))

@@ -12,16 +12,14 @@ from fastapi.responses import ORJSONResponse, RedirectResponse
 
 from src.core.config import settings
 from src.core.dependencies import CurrentUserID, DBSession
-from src.core.response import SuccessResponse, ok
+from src.core.response import ok_json
 from src.modules.auth.schemas import (
     ForgotPasswordRequest,
     LoginRequest,
-    LoginResponse,
     MessageResponse,
     RefreshTokenRequest,
     RegisterRequest,
     ResetPasswordRequest,
-    TokenResponse,
     VerifyEmailRequest,
 )
 from src.modules.auth.service import AuthService
@@ -183,7 +181,6 @@ async def oauth_github_callback(
 
 @router.post(
     "/register",
-    response_model=SuccessResponse[LoginResponse],
     status_code=status.HTTP_201_CREATED,
     summary="Register a new user account",
 )
@@ -198,12 +195,14 @@ async def register(
     """
     service = AuthService(db)
     result = await service.register(data, request_meta=_get_request_meta(request))
-    return ORJSONResponse(content=ok(result).model_dump(), status_code=status.HTTP_201_CREATED)
+    return ORJSONResponse(
+        content=ok_json(result.model_dump(mode="json")),
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 @router.post(
     "/login",
-    response_model=SuccessResponse[LoginResponse],
     summary="Login with email and password",
 )
 async def login(
@@ -213,7 +212,7 @@ async def login(
 ) -> ORJSONResponse:
     service = AuthService(db)
     result = await service.login(data, request_meta=_get_request_meta(request))
-    return ORJSONResponse(content=ok(result).model_dump())
+    return ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
 
 
 # ─────────────────────────────────────────────
@@ -223,7 +222,6 @@ async def login(
 
 @router.post(
     "/refresh",
-    response_model=SuccessResponse[TokenResponse],
     summary="Refresh access token",
 )
 async def refresh_token(
@@ -234,12 +232,11 @@ async def refresh_token(
     """Rotate the refresh token and issue a new access token."""
     service = AuthService(db)
     result = await service.refresh(data.refresh_token, request_meta=_get_request_meta(request))
-    return ORJSONResponse(content=ok(result).model_dump())
+    return ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
 
 
 @router.post(
     "/logout",
-    response_model=SuccessResponse[MessageResponse],
     summary="Logout (revoke refresh token)",
 )
 async def logout(
@@ -248,12 +245,11 @@ async def logout(
 ) -> ORJSONResponse:
     service = AuthService(db)
     result = await service.logout(data.refresh_token)
-    return ORJSONResponse(content=ok(result).model_dump())
+    return ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
 
 
 @router.post(
     "/logout-all",
-    response_model=SuccessResponse[MessageResponse],
     summary="Logout from all devices",
 )
 async def logout_all(
@@ -262,7 +258,7 @@ async def logout_all(
 ) -> ORJSONResponse:
     service = AuthService(db)
     result = await service.logout_all_devices(current_user_id)
-    return ORJSONResponse(content=ok(result).model_dump())
+    return ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
 
 
 # ─────────────────────────────────────────────
@@ -272,7 +268,6 @@ async def logout_all(
 
 @router.post(
     "/verify-email",
-    response_model=SuccessResponse[MessageResponse],
     summary="Verify email address with token",
 )
 async def verify_email(
@@ -281,7 +276,7 @@ async def verify_email(
 ) -> ORJSONResponse:
     service = AuthService(db)
     result = await service.verify_email(data.token)
-    return ORJSONResponse(content=ok(result).model_dump())
+    return ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
 
 
 # ─────────────────────────────────────────────
@@ -291,7 +286,6 @@ async def verify_email(
 
 @router.post(
     "/forgot-password",
-    response_model=SuccessResponse[MessageResponse],
     summary="Request password reset email",
 )
 async def forgot_password(
@@ -299,16 +293,15 @@ async def forgot_password(
     db: DBSession,
 ) -> ORJSONResponse:
     # Always return success to prevent email enumeration
-    return ORJSONResponse(content=ok(MessageResponse(message="If an account exists, a reset link has been sent")).model_dump())
+    return ORJSONResponse(content=ok_json(MessageResponse(message="If an account exists, a reset link has been sent").model_dump(mode="json")))
 
 
 @router.post(
     "/reset-password",
-    response_model=SuccessResponse[MessageResponse],
     summary="Reset password with token",
 )
 async def reset_password(
     data: ResetPasswordRequest,
     db: DBSession,
 ) -> ORJSONResponse:
-    return ORJSONResponse(content=ok(MessageResponse(message="Password reset successfully")).model_dump())
+    return ORJSONResponse(content=ok_json(MessageResponse(message="Password reset successfully").model_dump(mode="json")))

@@ -1,22 +1,22 @@
-from typing import Any
 
 """Helix — Analytics Module: Router"""
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Query
+from fastapi.responses import ORJSONResponse
 from sqlalchemy import func, select
 
 from src.core.dependencies import CurrentUserID, DBSession
-from src.core.response import SuccessResponse, ok
+from src.core.response import ok_json
 from src.modules.issues.models import Issue
 from src.modules.projects.models import IssueState
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
 
-@router.get("/projects/{project_id}/overview", response_model=SuccessResponse[dict[str, Any]])
-async def project_overview(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.get("/projects/{project_id}/overview")
+async def project_overview(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     """Total issues, by-state breakdown, by-priority breakdown."""
     # All issues in project
     issues_result = await db.execute(select(Issue).where(Issue.project_id == project_id, Issue.deleted_at.is_(None)))
@@ -39,34 +39,36 @@ async def project_overview(project_id: UUID, current_user_id: CurrentUserID, db:
             by_group[state.group] = by_group.get(state.group, 0) + 1
         by_priority[issue.priority] = by_priority.get(issue.priority, 0) + 1
 
-    return ok(
-        {
-            "total": len(issues),
-            "by_state": [{"name": k, "count": v} for k, v in by_state.items()],
-            "by_group": [{"name": k, "count": v} for k, v in by_group.items()],
-            "by_priority": [{"name": k, "count": v, "color": _priority_color(k)} for k, v in by_priority.items()],
-            "open_count": by_group.get("backlog", 0) + by_group.get("unstarted", 0) + by_group.get("started", 0),
-            "completed_count": by_group.get("completed", 0),
-            "overdue_count": len(
-                [
-                    i
-                    for i in issues
-                    if i.due_date
-                    and str(i.due_date) < str(datetime.now(tz=UTC).date())
-                    and str(states.get(str(i.state_id), IssueState()).group or "") not in ("completed", "cancelled")
-                ]
-            ),
-        }
+    return ORJSONResponse(
+        content=ok_json(
+            {
+                "total": len(issues),
+                "by_state": [{"name": k, "count": v} for k, v in by_state.items()],
+                "by_group": [{"name": k, "count": v} for k, v in by_group.items()],
+                "by_priority": [{"name": k, "count": v, "color": _priority_color(k)} for k, v in by_priority.items()],
+                "open_count": by_group.get("backlog", 0) + by_group.get("unstarted", 0) + by_group.get("started", 0),
+                "completed_count": by_group.get("completed", 0),
+                "overdue_count": len(
+                    [
+                        i
+                        for i in issues
+                        if i.due_date
+                        and str(i.due_date) < str(datetime.now(tz=UTC).date())
+                        and str(states.get(str(i.state_id), IssueState()).group or "") not in ("completed", "cancelled")
+                    ]
+                ),
+            }
+        )
     )
 
 
-@router.get("/projects/{project_id}/velocity", response_model=SuccessResponse[list[Any]])
+@router.get("/projects/{project_id}/velocity")
 async def velocity(
     project_id: UUID,
     current_user_id: CurrentUserID,
     db: DBSession,
     weeks: int = Query(8, ge=2, le=26),
-) -> Any:
+) -> ORJSONResponse:
     """Issues completed per week for the last N weeks."""
     now = datetime.now(tz=UTC)
     data = []
@@ -93,11 +95,11 @@ async def velocity(
             }
         )
 
-    return ok(data)
+    return ORJSONResponse(content=ok_json(data))
 
 
-@router.get("/projects/{project_id}/assignee-workload", response_model=SuccessResponse[list[Any]])
-async def assignee_workload(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+@router.get("/projects/{project_id}/assignee-workload")
+async def assignee_workload(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> ORJSONResponse:
     """Count of open issues per assignee."""
     from src.modules.issues.models import IssueAssignee
     from src.modules.users.models import User
@@ -112,7 +114,7 @@ async def assignee_workload(project_id: UUID, current_user_id: CurrentUserID, db
         .limit(15)
     )
     rows = result.all()
-    return ok([{"name": r.display_name, "avatar_url": r.avatar_url, "count": r.count} for r in rows])
+    return ORJSONResponse(content=ok_json([{"name": r.display_name, "avatar_url": r.avatar_url, "count": r.count} for r in rows]))
 
 
 def _priority_color(p: str) -> str:
