@@ -65,7 +65,15 @@ class OrgService:
         user_result = await self._db.execute(select(User).where(User.email == email))
         user = user_result.scalar_one_or_none()
         if not user:
-            raise NotFoundError("User", email)
+            import uuid
+            username = f"invited_{uuid.uuid4().hex[:8]}"
+            user = User(
+                email=email,
+                username=username,
+                display_name=email.split("@")[0],
+            )
+            self._db.add(user)
+            await self._db.flush()
 
         # Check existing membership
         existing = await self._db.execute(select(OrgMembership).where(OrgMembership.organization_id == org.id, OrgMembership.user_id == user.id))
