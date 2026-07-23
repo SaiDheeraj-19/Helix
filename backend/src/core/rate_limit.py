@@ -7,8 +7,9 @@ from __future__ import annotations
 import hashlib
 import time
 
-from fastapi import Request, Response
+from fastapi import FastAPI, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
+from typing import Any, Callable, Awaitable
 from starlette.responses import JSONResponse
 
 # Routes with custom limits (requests per minute)
@@ -27,7 +28,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     Falls back to no-op if Redis is unavailable.
     """
 
-    def __init__(self, app, redis_client=None):
+    def __init__(self, app: FastAPI, redis_client: Any = None) -> None:
         super().__init__(app)
         self._redis = redis_client
 
@@ -47,7 +48,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         ip = request.client.host if request.client else "unknown"
         return f"rl:ip:{ip}", False
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         # Skip health, docs, and static assets
         path = request.url.path
         if path in ("/api/health", "/docs", "/openapi.json", "/redoc") or not path.startswith("/api"):

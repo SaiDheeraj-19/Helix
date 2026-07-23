@@ -1,3 +1,4 @@
+from typing import Any
 """
 Helix — Auth Module: Router
 FastAPI route handlers for authentication endpoints.
@@ -27,7 +28,7 @@ from src.modules.auth.service import AuthService
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-def _get_request_meta(request: Request) -> dict:
+def _get_request_meta(request: Request) -> dict[str, Any]:
     """Extract IP and User-Agent from request."""
     return {
         "ip": request.client.host if request.client else None,

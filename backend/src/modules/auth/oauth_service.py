@@ -118,7 +118,7 @@ async def exchange_google_code(code: str) -> dict[str, Any]:
         if userinfo_resp.status_code != 200:
             raise UnauthorizedError("Failed to fetch Google user info")
 
-        return userinfo_resp.json()
+        return dict(userinfo_resp.json())
 
 
 async def exchange_github_code(code: str) -> dict[str, Any]:
@@ -168,7 +168,7 @@ async def exchange_github_code(code: str) -> dict[str, Any]:
                 )
                 profile["email"] = primary
 
-        return profile
+        return dict(profile)
 
 
 # ─────────────────────────────────────────────

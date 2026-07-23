@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — Cycles Module: Service"""
 from __future__ import annotations
 
@@ -90,7 +91,7 @@ class CycleService:
         )
         await self._db.flush()
 
-    def compute_progress(self, cycle: Cycle) -> dict:
+    def compute_progress(self, cycle: Cycle) -> dict[str, Any]:
         """Compute progress stats from in-memory cycle issues."""
         total = len(cycle.issues)
         if total == 0:

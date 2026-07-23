@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — Users Module: Router (stub)"""
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -13,14 +14,14 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.get("/me", response_model=SuccessResponse[UserResponse], summary="Get current user profile")
-async def get_me(current_user_id: CurrentUserID, db: DBSession):
+async def get_me(current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = UserService(db)
     user = await service.get_by_id(current_user_id)
     return ok(UserResponse.model_validate(user))
 
 
 @router.patch("/me", response_model=SuccessResponse[UserResponse], summary="Update current user profile")
-async def update_me(data: UpdateUserRequest, current_user_id: CurrentUserID, db: DBSession):
+async def update_me(data: UpdateUserRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = UserService(db)
     user = await service.update(current_user_id, data)
     return ok(UserResponse.model_validate(user))
@@ -37,7 +38,7 @@ class AvatarUploadResponse(BaseModel):
 
 
 @router.post("/me/avatar/upload-url", response_model=SuccessResponse[AvatarUploadResponse], summary="Get upload URL for user avatar")
-async def get_avatar_upload_url(data: AvatarUploadRequest, current_user_id: CurrentUserID):
+async def get_avatar_upload_url(data: AvatarUploadRequest, current_user_id: CurrentUserID) -> Any:
     storage = StorageService()
 
     # Generate unique key

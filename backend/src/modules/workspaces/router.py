@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — Workspaces Module: Router"""
 from fastapi import APIRouter
 
@@ -15,14 +16,14 @@ async def create_workspace(
     data: CreateWorkspaceRequest,
     current_user_id: CurrentUserID,
     db: DBSession,
-):
+) -> Any:
     service = WorkspaceService(db)
     ws = await service.create(org_slug=org_slug, data=data, user_id=current_user_id)
     return ok(WorkspaceResponse.model_validate(ws))
 
 
 @router.get("/{ws_slug}", response_model=SuccessResponse[WorkspaceResponse])
-async def get_workspace(org_slug: str, ws_slug: str, current_user_id: CurrentUserID, db: DBSession):
+async def get_workspace(org_slug: str, ws_slug: str, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = WorkspaceService(db)
     ws = await service.get_by_slug(org_slug=org_slug, slug=ws_slug)
     return ok(WorkspaceResponse.model_validate(ws))

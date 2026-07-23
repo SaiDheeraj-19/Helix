@@ -25,12 +25,12 @@ _pwd_context = CryptContext(
 
 def hash_password(password: str) -> str:
     """Hash a plaintext password using bcrypt."""
-    return _pwd_context.hash(password)
+    return str(_pwd_context.hash(password))
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """Verify a plaintext password against a bcrypt hash."""
-    return _pwd_context.verify(plain, hashed)
+    return bool(_pwd_context.verify(plain, hashed))
 
 
 # ─────────────────────────────────────────────
@@ -84,10 +84,12 @@ def create_token(
     if extra_claims:
         claims.update(extra_claims)
 
-    return jwt.encode(
-        claims,
-        settings.SECRET_KEY,
-        algorithm=settings.JWT_ALGORITHM,
+    return str(
+        jwt.encode(
+            claims,
+            settings.SECRET_KEY,
+            algorithm=settings.JWT_ALGORITHM,
+        )
     )
 
 
@@ -112,7 +114,7 @@ def decode_token(token: str, expected_type: TokenType | None = None) -> dict[str
             f"Invalid token type: expected '{expected_type}', got '{payload.get('type')}'"
         )
 
-    return payload
+    return dict(payload)
 
 
 def create_access_token(user_id: str | UUID, org_slug: str | None = None) -> str:

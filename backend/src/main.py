@@ -4,6 +4,7 @@ Helix Backend — Main Application Entry Point
 
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import Any
 
 import structlog
 from fastapi import FastAPI
@@ -113,13 +114,13 @@ def _register_routers(app: FastAPI) -> None:
 
     # Health check — full liveness probe
     @app.get("/api/health", tags=["System"], include_in_schema=False)
-    async def health() -> dict:
+    async def health() -> dict[str, Any]:
         import time
 
         from src.core.config import settings as s
         from src.infrastructure.database.session import async_session_factory
 
-        checks: dict[str, dict] = {}
+        checks: dict[str, dict[str, Any]] = {}
 
         # ─── Database ────────────────────────────────────
         t0 = time.monotonic()
@@ -134,7 +135,7 @@ def _register_routers(app: FastAPI) -> None:
         t0 = time.monotonic()
         try:
             import redis.asyncio as aioredis
-            r = aioredis.from_url(s.redis_url_str, socket_connect_timeout=2)
+            r = aioredis.from_url(s.redis_url_str, socket_connect_timeout=2) # type: ignore
             await r.ping()
             await r.aclose()
             checks["redis"] = {"status": "ok", "latency_ms": round((time.monotonic() - t0) * 1000, 1)}
@@ -147,7 +148,7 @@ def _register_routers(app: FastAPI) -> None:
             from src.infrastructure.storage.minio import StorageService
             storage = StorageService()
             # List buckets as a liveness probe
-            storage.client.list_buckets()
+            storage._client.list_buckets()
             checks["minio"] = {"status": "ok", "latency_ms": round((time.monotonic() - t0) * 1000, 1)}
         except Exception as e:
             checks["minio"] = {"status": "error", "detail": str(e)}

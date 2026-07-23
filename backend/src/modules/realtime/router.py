@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — WebSocket Router"""
 import structlog
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
@@ -15,7 +16,7 @@ async def project_websocket(
     websocket: WebSocket,
     project_id: str,
     token: str = Query(...),
-):
+) -> Any:
     """
     WebSocket endpoint for real-time project updates.
     Client connects with: ws://localhost:8000/api/v1/ws/projects/{id}?token=<access_token>

@@ -11,6 +11,7 @@ import structlog
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.exceptions import UnauthorizedError
@@ -47,7 +48,7 @@ DBSession = Annotated[AsyncSession, Depends(get_db)]
 # =============================================================================
 
 
-async def get_redis() -> AsyncGenerator[any, None]:
+async def get_redis() -> AsyncGenerator[Redis, None]:
     """Provide a Redis client per request."""
     client = await get_redis_client()
     try:
@@ -56,7 +57,7 @@ async def get_redis() -> AsyncGenerator[any, None]:
         pass  # Pool manages connections
 
 
-RedisClient = Annotated[any, Depends(get_redis)]
+RedisClient = Annotated[Redis, Depends(get_redis)]
 
 # =============================================================================
 # Authentication

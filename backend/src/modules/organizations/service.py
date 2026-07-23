@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — Organizations Module: Service"""
 from uuid import UUID
 
@@ -49,7 +50,7 @@ class OrgService:
             raise NotFoundError("Organization", slug)
         return org
 
-    async def get_members(self, org_slug: str):
+    async def get_members(self, org_slug: str) -> Any:
         from sqlalchemy.orm import selectinload
         org = await self.get_by_slug(org_slug)
         result = await self._db.execute(
@@ -59,7 +60,7 @@ class OrgService:
         )
         return result.scalars().all()
 
-    async def add_member(self, org_slug: str, email: str, role: str):
+    async def add_member(self, org_slug: str, email: str, role: str) -> Any:
         from src.modules.users.models import User
         org = await self.get_by_slug(org_slug)
 
@@ -91,7 +92,7 @@ class OrgService:
         await self._db.refresh(membership, ["user"])
         return membership
 
-    async def update_member_role(self, org_slug: str, membership_id: UUID, new_role: str):
+    async def update_member_role(self, org_slug: str, membership_id: UUID, new_role: str) -> Any:
         org = await self.get_by_slug(org_slug)
         result = await self._db.execute(
             select(OrgMembership).where(
@@ -108,7 +109,7 @@ class OrgService:
         await self._db.refresh(membership, ["user"])
         return membership
 
-    async def remove_member(self, org_slug: str, membership_id: UUID):
+    async def remove_member(self, org_slug: str, membership_id: UUID) -> Any:
         org = await self.get_by_slug(org_slug)
         result = await self._db.execute(
             select(OrgMembership).where(

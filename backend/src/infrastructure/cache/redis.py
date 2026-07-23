@@ -71,7 +71,8 @@ class RedisCache:
         return f"{self._prefix}:{key}"
 
     async def get(self, key: str) -> str | None:
-        return await self._client.get(self._key(key))
+        val = await self._client.get(self._key(key))
+        return str(val) if val is not None else None
 
     async def set(
         self,
@@ -88,7 +89,7 @@ class RedisCache:
         """Delete all keys matching a pattern. Use carefully in production."""
         keys = await self._client.keys(self._key(pattern))
         if keys:
-            return await self._client.delete(*keys)
+            return int(await self._client.delete(*keys))
         return 0
 
     async def exists(self, key: str) -> bool:
@@ -99,10 +100,10 @@ class RedisCache:
         value = await self._client.incrby(full_key, amount)
         if ttl and value == amount:  # First increment — set TTL
             await self._client.expire(full_key, ttl)
-        return value
+        return int(value)
 
     async def ttl(self, key: str) -> int:
-        return await self._client.ttl(self._key(key))
+        return int(await self._client.ttl(self._key(key)))
 
 
 # =============================================================================

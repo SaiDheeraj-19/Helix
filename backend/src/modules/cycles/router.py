@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — Cycles Module: Router"""
 from uuid import UUID
 
@@ -13,7 +14,7 @@ from src.modules.workspaces.models import Workspace
 router = APIRouter(tags=["Cycles"])
 
 
-def _serialize(cycle, progress: dict) -> CycleResponse:
+def _serialize(cycle: Any, progress: dict[str, Any]) -> CycleResponse:
     return CycleResponse(
         id=str(cycle.id),
         project_id=str(cycle.project_id),
@@ -37,7 +38,7 @@ def _serialize(cycle, progress: dict) -> CycleResponse:
     response_model=SuccessResponse[list[CycleResponse]],
     summary="List all cycles in a project",
 )
-async def list_cycles(ws_slug: str, project_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def list_cycles(ws_slug: str, project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     svc = CycleService(db)
     cycles = await svc.list_for_project(project_id)
     return ok([_serialize(c, svc.compute_progress(c)) for c in cycles])
@@ -55,7 +56,7 @@ async def create_cycle(
     data: CycleCreate,
     current_user_id: CurrentUserID,
     db: DBSession,
-):
+) -> Any:
     # Resolve workspace_id from slug
     ws_result = await db.execute(
         select(Workspace).where(Workspace.slug == ws_slug, Workspace.deleted_at.is_(None))
@@ -75,7 +76,7 @@ async def create_cycle(
     response_model=SuccessResponse[CycleResponse],
     summary="Get cycle detail",
 )
-async def get_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def get_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     svc = CycleService(db)
     cycle = await svc.get_by_id(cycle_id)
     return ok(_serialize(cycle, svc.compute_progress(cycle)))
@@ -86,14 +87,14 @@ async def get_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSessio
     response_model=SuccessResponse[CycleResponse],
     summary="Update a cycle",
 )
-async def update_cycle(cycle_id: UUID, data: CycleUpdate, current_user_id: CurrentUserID, db: DBSession):
+async def update_cycle(cycle_id: UUID, data: CycleUpdate, current_user_id: CurrentUserID, db: DBSession) -> Any:
     svc = CycleService(db)
     cycle = await svc.update(cycle_id, data)
     return ok(_serialize(cycle, svc.compute_progress(cycle)))
 
 
 @router.delete("/cycles/{cycle_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def delete_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     svc = CycleService(db)
     await svc.delete(cycle_id)
 
@@ -103,13 +104,13 @@ async def delete_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSes
     response_model=SuccessResponse[CycleResponse],
     summary="Add issues to a cycle",
 )
-async def add_issues(cycle_id: UUID, data: CycleIssueAdd, current_user_id: CurrentUserID, db: DBSession):
+async def add_issues(cycle_id: UUID, data: CycleIssueAdd, current_user_id: CurrentUserID, db: DBSession) -> Any:
     svc = CycleService(db)
     cycle = await svc.add_issues(cycle_id, data.issue_ids)
     return ok(_serialize(cycle, svc.compute_progress(cycle)))
 
 
 @router.delete("/cycles/{cycle_id}/issues/{issue_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_issue(cycle_id: UUID, issue_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def remove_issue(cycle_id: UUID, issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     svc = CycleService(db)
     await svc.remove_issue(cycle_id, issue_id)

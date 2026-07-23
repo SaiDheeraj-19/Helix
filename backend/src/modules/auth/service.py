@@ -1,3 +1,4 @@
+from typing import Any
 """
 Helix — Auth Module: Service
 Business logic layer — orchestrates repository calls, sends events.
@@ -38,7 +39,7 @@ class AuthService:
         self._repo = AuthRepository(db)
         self._db = db
 
-    async def register(self, data: RegisterRequest, request_meta: dict | None = None) -> LoginResponse:
+    async def register(self, data: RegisterRequest, request_meta: dict[str, Any] | None = None) -> LoginResponse:
         """Register a new user with email/password."""
 
         # Check uniqueness
@@ -70,7 +71,7 @@ class AuthService:
         return LoginResponse(tokens=tokens, user=AuthUserResponse.model_validate(user))
 
     async def login(
-        self, data: LoginRequest, request_meta: dict | None = None
+        self, data: LoginRequest, request_meta: dict[str, Any] | None = None
     ) -> LoginResponse:
         """Authenticate with email/password."""
         user = await self._repo.get_user_by_email(data.email)
@@ -97,7 +98,7 @@ class AuthService:
         return LoginResponse(tokens=tokens, user=AuthUserResponse.model_validate(user))
 
     async def refresh(
-        self, token: str, request_meta: dict | None = None
+        self, token: str, request_meta: dict[str, Any] | None = None
     ) -> TokenResponse:
         """Rotate a refresh token. Detects reuse via token families."""
         stored = await self._repo.get_refresh_token(token)

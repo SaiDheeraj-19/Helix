@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — Organizations Module: Schemas"""
 
 from pydantic import BaseModel, Field, field_validator
@@ -21,7 +22,7 @@ class CreateOrgRequest(BaseModel):
 
     @field_validator("slug", mode="before")
     @classmethod
-    def auto_slug(cls, v, info):
+    def auto_slug(cls, v: Any, info: Any) -> Any:
         if not v and info.data.get("name"):
             return slugify(info.data["name"])
         return v

@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — AI Module: Router
 Integrates Ollama (primary) + Groq (fallback) for AI-native features.
 Streams responses via Server-Sent Events (SSE).
@@ -42,7 +43,7 @@ class IssueGenerateRequest(BaseModel):
 
 # ── Client helpers ─────────────────────────────────────────────────────────────
 
-async def _ollama_stream(messages: list[dict], model: str) -> AsyncIterator[str]:
+async def _ollama_stream(messages: list[dict[str, Any]], model: str) -> AsyncIterator[str]:
     """Stream from local Ollama instance."""
     import httpx
     payload = {"model": model, "messages": messages, "stream": True}
@@ -62,7 +63,7 @@ async def _ollama_stream(messages: list[dict], model: str) -> AsyncIterator[str]
                         continue
 
 
-async def _groq_stream(messages: list[dict], model: str) -> AsyncIterator[str]:
+async def _groq_stream(messages: list[dict[str, Any]], model: str) -> AsyncIterator[str]:
     """Stream from Groq API as fallback."""
     import httpx
     headers = {"Authorization": f"Bearer {settings.GROQ_API_KEY}", "Content-Type": "application/json"}
@@ -103,7 +104,7 @@ async def _complete_text(prompt: str, system: str = "") -> str:
                 json={"model": "llama3.2", "messages": messages, "stream": False},
             )
             resp.raise_for_status()
-            return resp.json()["message"]["content"]
+            return str(resp.json()["message"]["content"])
     except Exception:
         pass  # Fallback to Groq
 
@@ -117,7 +118,7 @@ async def _complete_text(prompt: str, system: str = "") -> str:
                 json={"model": "llama3-8b-8192", "messages": messages},
             )
             resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"]
+            return str(resp.json()["choices"][0]["message"]["content"])
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"AI service unavailable: {e}")
 
@@ -125,7 +126,7 @@ async def _complete_text(prompt: str, system: str = "") -> str:
 # ── Endpoints ──────────────────────────────────────────────────────────────────
 
 @router.post("/chat", summary="Streaming AI chat (SSE)")
-async def chat(request: ChatRequest, current_user_id: CurrentUserID):
+async def chat(request: ChatRequest, current_user_id: CurrentUserID) -> Any:
     """
     Main AI chat endpoint.
     Returns a Server-Sent Events stream when stream=True.
@@ -147,7 +148,7 @@ async def chat(request: ChatRequest, current_user_id: CurrentUserID):
         content = await _complete_text(messages[-1]["content"])
         return ok({"content": content})
 
-    async def event_stream():
+    async def event_stream() -> Any:
         try:
             async for chunk in _ollama_stream(messages, request.model):
                 yield chunk
@@ -169,8 +170,8 @@ async def chat(request: ChatRequest, current_user_id: CurrentUserID):
     )
 
 
-@router.post("/issues/{issue_id}/summarize", response_model=SuccessResponse[dict])
-async def summarize_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+@router.post("/issues/{issue_id}/summarize", response_model=SuccessResponse[dict[str, Any]])
+async def summarize_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     """Generate a concise summary of an issue including its comments."""
     from src.modules.issues.models import Issue
 
@@ -200,8 +201,8 @@ async def summarize_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DB
     return ok({"summary": summary, "issue_id": str(issue_id)})
 
 
-@router.post("/issues/generate", response_model=SuccessResponse[list])
-async def generate_issues(request: IssueGenerateRequest, current_user_id: CurrentUserID):
+@router.post("/issues/generate", response_model=SuccessResponse[list[Any]])
+async def generate_issues(request: IssueGenerateRequest, current_user_id: CurrentUserID) -> Any:
     """
     Generate a list of actionable issues from a natural language feature description.
     """
@@ -230,8 +231,8 @@ async def generate_issues(request: IssueGenerateRequest, current_user_id: Curren
     return ok(issues)
 
 
-@router.post("/issues/{issue_id}/suggest-labels", response_model=SuccessResponse[list])
-async def suggest_labels(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+@router.post("/issues/{issue_id}/suggest-labels", response_model=SuccessResponse[list[Any]])
+async def suggest_labels(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     """Suggest labels for an issue based on its title and description."""
     from src.modules.issues.models import Issue
     from src.modules.projects.models import Label

@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — Organizations Module: Router (stub)"""
 from uuid import UUID
 
@@ -18,21 +19,21 @@ router = APIRouter(prefix="/orgs", tags=["Organizations"])
 
 
 @router.post("", response_model=SuccessResponse[OrgResponse], status_code=201, summary="Create organization")
-async def create_org(data: CreateOrgRequest, current_user_id: CurrentUserID, db: DBSession):
+async def create_org(data: CreateOrgRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = OrgService(db)
     org = await service.create(data, owner_id=current_user_id)
     return ok(OrgResponse.model_validate(org))
 
 
 @router.get("/{slug}", response_model=SuccessResponse[OrgResponse], summary="Get organization by slug")
-async def get_org(slug: str, current_user_id: CurrentUserID, db: DBSession):
+async def get_org(slug: str, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = OrgService(db)
     org = await service.get_by_slug(slug)
     return ok(OrgResponse.model_validate(org))
 
 
 @router.get("/{slug}/members", response_model=SuccessResponse[list[OrgMemberResponse]])
-async def list_members(slug: str, current_user_id: CurrentUserID, db: DBSession):
+async def list_members(slug: str, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = OrgService(db)
     members = await service.get_members(slug)
     result = []
@@ -50,7 +51,7 @@ async def list_members(slug: str, current_user_id: CurrentUserID, db: DBSession)
 
 
 @router.post("/{slug}/members", response_model=SuccessResponse[OrgMemberResponse], status_code=status.HTTP_201_CREATED)
-async def add_member(slug: str, data: AddMemberRequest, current_user_id: CurrentUserID, db: DBSession):
+async def add_member(slug: str, data: AddMemberRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = OrgService(db)
     m = await service.add_member(slug, data.email, data.role)
     return ok(OrgMemberResponse(
@@ -61,7 +62,7 @@ async def add_member(slug: str, data: AddMemberRequest, current_user_id: Current
 
 
 @router.patch("/{slug}/members/{membership_id}", response_model=SuccessResponse[OrgMemberResponse])
-async def update_member(slug: str, membership_id: UUID, data: UpdateMemberRoleRequest, current_user_id: CurrentUserID, db: DBSession):
+async def update_member(slug: str, membership_id: UUID, data: UpdateMemberRoleRequest, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = OrgService(db)
     m = await service.update_member_role(slug, membership_id, data.role)
     return ok(OrgMemberResponse(
@@ -72,6 +73,6 @@ async def update_member(slug: str, membership_id: UUID, data: UpdateMemberRoleRe
 
 
 @router.delete("/{slug}/members/{membership_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_member(slug: str, membership_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def remove_member(slug: str, membership_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = OrgService(db)
     await service.remove_member(slug, membership_id)

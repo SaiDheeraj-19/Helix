@@ -3,7 +3,13 @@ from __future__ import annotations
 
 import datetime
 from enum import Enum as PyEnum
+from typing import TYPE_CHECKING
 from uuid import UUID as UUIDType
+
+if TYPE_CHECKING:
+    from src.modules.projects.models import Project
+    from src.modules.users.models import User
+    from src.modules.issues.models import Issue
 
 from sqlalchemy import Date, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship

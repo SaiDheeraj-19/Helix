@@ -207,11 +207,15 @@ class Settings(BaseSettings):
             stripped = v.strip()
             if stripped.startswith("["):
                 try:
-                    return json.loads(stripped)
+                    parsed = json.loads(stripped)
+                    if isinstance(parsed, list):
+                        return [str(p) for p in parsed]
                 except json.JSONDecodeError:
                     pass
             return [origin.strip() for origin in stripped.split(",") if origin.strip()]
-        return v
+        if isinstance(v, list):
+            return [str(x) for x in v]
+        return [str(v)]
 
     @property
     def is_production(self) -> bool:
@@ -238,7 +242,7 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     """Cached settings instance — loaded once at startup."""
-    return Settings()  # type: ignore[call-arg]
+    return Settings()
 
 
 settings = get_settings()

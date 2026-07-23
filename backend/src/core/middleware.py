@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from typing import Any, Callable, Awaitable
 
 from src.core.config import settings
 
@@ -28,7 +29,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
     method, path, status code, and response time.
     """
 
-    async def dispatch(self, request: Request, call_next: any) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         request_id = request.headers.get("X-Request-ID") or str(uuid4())
         request.state.request_id = request_id
 
@@ -69,7 +70,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Adds security headers to all responses."""
 
-    async def dispatch(self, request: Request, call_next: any) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         response = await call_next(request)
 
         response.headers["X-Content-Type-Options"] = "nosniff"
@@ -124,7 +125,7 @@ def register_middleware(app: FastAPI) -> None:
 
     # Rate limiting
     from src.core.rate_limit import RateLimitMiddleware
-    app.add_middleware(RateLimitMiddleware)
+    app.add_middleware(RateLimitMiddleware) # type: ignore
 
     # Security headers
     app.add_middleware(SecurityHeadersMiddleware)

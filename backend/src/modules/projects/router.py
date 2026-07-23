@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — Projects Module: Router"""
 from uuid import UUID
 
@@ -33,7 +34,7 @@ async def create_project(
     data: ProjectCreate,
     current_user_id: CurrentUserID,
     db: DBSession,
-):
+) -> Any:
     service = ProjectService(db)
     project = await service.create(ws_slug, data, current_user_id)
     return ok(ProjectResponse.model_validate(project))
@@ -44,7 +45,7 @@ async def create_project(
     response_model=SuccessResponse[list[ProjectResponse]],
     summary="List projects in a workspace",
 )
-async def list_projects(ws_slug: str, current_user_id: CurrentUserID, db: DBSession):
+async def list_projects(ws_slug: str, current_user_id: CurrentUserID, db: DBSession) -> Any:
     from sqlalchemy import select
 
     from src.modules.workspaces.models import Workspace
@@ -65,7 +66,7 @@ async def list_projects(ws_slug: str, current_user_id: CurrentUserID, db: DBSess
     response_model=SuccessResponse[ProjectResponse],
     summary="Get project by identifier",
 )
-async def get_project(ws_slug: str, identifier: str, current_user_id: CurrentUserID, db: DBSession):
+async def get_project(ws_slug: str, identifier: str, current_user_id: CurrentUserID, db: DBSession) -> Any:
     from sqlalchemy import select
 
     from src.modules.workspaces.models import Workspace
@@ -88,14 +89,14 @@ async def get_project(ws_slug: str, identifier: str, current_user_id: CurrentUse
 )
 async def update_project(
     project_id: UUID, data: ProjectUpdate, current_user_id: CurrentUserID, db: DBSession
-):
+) -> Any:
     service = ProjectService(db)
     project = await service.update(project_id, data, current_user_id)
     return ok(ProjectResponse.model_validate(project))
 
 
 @router.delete("/projects/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_project(project_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def delete_project(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = ProjectService(db)
     await service.delete(project_id, current_user_id)
 
@@ -106,7 +107,7 @@ async def delete_project(project_id: UUID, current_user_id: CurrentUserID, db: D
     "/projects/{project_id}/states",
     response_model=SuccessResponse[list[IssueStateResponse]],
 )
-async def list_states(project_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def list_states(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = ProjectService(db)
     states = await service.get_states(project_id)
     return ok([IssueStateResponse.model_validate(s) for s in states])
@@ -119,7 +120,7 @@ async def list_states(project_id: UUID, current_user_id: CurrentUserID, db: DBSe
 )
 async def create_state(
     project_id: UUID, data: IssueStateCreate, current_user_id: CurrentUserID, db: DBSession
-):
+) -> Any:
     service = ProjectService(db)
     state = await service.create_state(project_id, data)
     return ok(IssueStateResponse.model_validate(state))
@@ -131,7 +132,7 @@ async def create_state(
     "/projects/{project_id}/labels",
     response_model=SuccessResponse[list[LabelResponse]],
 )
-async def list_labels(project_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def list_labels(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = ProjectService(db)
     labels = await service.get_labels(project_id)
     return ok([LabelResponse.model_validate(l) for l in labels])
@@ -144,7 +145,7 @@ async def list_labels(project_id: UUID, current_user_id: CurrentUserID, db: DBSe
 )
 async def create_label(
     project_id: UUID, data: LabelCreate, current_user_id: CurrentUserID, db: DBSession
-):
+) -> Any:
     service = ProjectService(db)
     label = await service.create_label(project_id, data)
     return ok(LabelResponse.model_validate(label))
@@ -156,7 +157,7 @@ async def create_label(
     "/projects/{project_id}/members",
     response_model=SuccessResponse[list[ProjectMemberResponse]],
 )
-async def list_members(project_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def list_members(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     service = ProjectService(db)
     members = await service.get_members(project_id)
     result = []

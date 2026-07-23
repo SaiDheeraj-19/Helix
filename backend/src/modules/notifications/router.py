@@ -1,3 +1,4 @@
+from typing import Any
 """Helix — Notifications Module: Router"""
 from datetime import UTC, datetime
 from uuid import UUID
@@ -29,7 +30,7 @@ async def list_notifications(
     current_user_id: CurrentUserID,
     db: DBSession,
     unread_only: bool = False,
-):
+) -> Any:
     """Get all notifications for the current user."""
     query = select(InAppNotification).where(
         InAppNotification.user_id == current_user_id
@@ -57,7 +58,7 @@ async def list_notifications(
 
 
 @router.post("/{notification_id}/read", status_code=status.HTTP_204_NO_CONTENT)
-async def mark_read(notification_id: UUID, current_user_id: CurrentUserID, db: DBSession):
+async def mark_read(notification_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
     """Mark a single notification as read."""
     await db.execute(
         update(InAppNotification)
@@ -71,7 +72,7 @@ async def mark_read(notification_id: UUID, current_user_id: CurrentUserID, db: D
 
 
 @router.post("/read-all", status_code=status.HTTP_204_NO_CONTENT)
-async def mark_all_read(current_user_id: CurrentUserID, db: DBSession):
+async def mark_all_read(current_user_id: CurrentUserID, db: DBSession) -> Any:
     """Mark all notifications as read."""
     now = datetime.now(tz=UTC).isoformat()
     await db.execute(
@@ -85,8 +86,8 @@ async def mark_all_read(current_user_id: CurrentUserID, db: DBSession):
     await db.flush()
 
 
-@router.get("/unread-count", response_model=SuccessResponse[dict])
-async def unread_count(current_user_id: CurrentUserID, db: DBSession):
+@router.get("/unread-count", response_model=SuccessResponse[dict[str, Any]])
+async def unread_count(current_user_id: CurrentUserID, db: DBSession) -> Any:
     """Get unread notification count for badge display."""
     from sqlalchemy import func
     result = await db.execute(
