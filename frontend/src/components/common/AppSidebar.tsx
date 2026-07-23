@@ -16,9 +16,7 @@ import { Logo } from "@/components/common/Logo";
 import { useQuery } from "@tanstack/react-query";
 import { projectsApi } from "@/lib/api";
 import type { Project } from "@/types";
-
-const WORKSPACE_SLUG = "default";
-
+import { useWorkspaceStore } from "@/store/workspace.store";
 const mainNavItems = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard, exact: true },
   { label: "My Issues", href: "/issues", icon: CircleDot },
@@ -41,6 +39,7 @@ export function AppSidebar() {
   const router = useRouter();
   const { sidebarCollapsed, openCreateIssue } = useUIStore();
   const { user } = useAuthStore();
+  const { currentWorkspaceSlug: WORKSPACE_SLUG } = useWorkspaceStore();
 
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ["projects", WORKSPACE_SLUG],

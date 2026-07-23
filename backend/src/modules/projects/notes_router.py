@@ -17,6 +17,19 @@ from src.modules.projects.models import StickyNote
 router = APIRouter(tags=["Notes"])
 
 
+@router.get("/users/me/notes", response_model=list[StickyNoteResponse], summary="List all sticky notes for the current user")
+async def list_user_notes(
+    db: DBSession,
+    user_id: CurrentUserID,
+) -> Any:
+    """List all sticky notes created by the current user across all projects."""
+    result = await db.execute(
+        select(StickyNote)
+        .where(StickyNote.created_by == user_id, StickyNote.deleted_at.is_(None))
+        .order_by(StickyNote.created_at.desc())
+    )
+    return result.scalars().all()
+
 class StickyNoteCreate(BaseModel):
     content: str
     color: str | None = "#FEF3C7"

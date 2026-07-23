@@ -12,9 +12,9 @@ import { toast } from "sonner";
 
 import { api } from "@/lib/api-client";
 import { formatShortDate, cn } from "@/lib/utils";
+import { useWorkspaceStore } from "@/store/workspace.store";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
-const WORKSPACE_SLUG = "default";
 const PROJECT_ID = "default"; // Mocking for now, would be from context/url
 
 interface Cycle {
@@ -59,12 +59,13 @@ function ProgressRing({ percentage, size = 40 }: { percentage: number; size?: nu
 
 export default function CyclesPage() {
   const queryClient = useQueryClient();
+  const { currentWorkspaceSlug: WORKSPACE_SLUG } = useWorkspaceStore();
   const [createOpen, setCreateOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["cycles", PROJECT_ID],
     queryFn: () => api.get<Cycle[]>(`/api/v1/workspaces/${WORKSPACE_SLUG}/projects/${PROJECT_ID}/cycles`),
-    enabled: !!PROJECT_ID,
+    enabled: !!PROJECT_ID && !!WORKSPACE_SLUG,
   });
   
   const cycles: Cycle[] = (data && data.data) ? data.data : [];

@@ -22,12 +22,12 @@ import { toast } from "sonner";
 import { projectsApi } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { Project } from "@/types";
+import { useRouter } from "next/navigation";
+import { useWorkspaceStore } from "@/store/workspace.store";
 
 // ─────────────────────────────────────────────
 // Schema
 // ─────────────────────────────────────────────
-
-const WORKSPACE_SLUG = "default"; // TODO: from URL params / store
 
 const PROJECT_COLORS = [
   "#6366f1", "#3b82f6", "#06b6d4", "#10b981",
@@ -62,10 +62,12 @@ const networkConfig = {
 // ─────────────────────────────────────────────
 
 export default function ProjectsPage() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedColor, setSelectedColor] = useState("#6366f1");
   const queryClient = useQueryClient();
+  const { currentWorkspaceSlug: WORKSPACE_SLUG } = useWorkspaceStore();
 
   const { data, isLoading } = useQuery({
     queryKey: ["projects", WORKSPACE_SLUG],
