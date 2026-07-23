@@ -48,7 +48,7 @@ async def get_avatar_upload_url(data: AvatarUploadRequest, current_user_id: Curr
     ext = data.file_name.split(".")[-1] if "." in data.file_name else "png"
     storage_key = f"{current_user_id}/{uuid.uuid4().hex}.{ext}"
 
-    upload_url = storage.generate_presigned_upload_url(
+    upload_data = storage.generate_presigned_upload_url(
         bucket=settings.MINIO_ATTACHMENTS_BUCKET,
         key=storage_key,
         content_type=data.content_type,
@@ -60,4 +60,4 @@ async def get_avatar_upload_url(data: AvatarUploadRequest, current_user_id: Curr
         expires_in=604800,
     )
 
-    return ORJSONResponse(content=ok_json(AvatarUploadResponse(upload_url=upload_url, avatar_url=avatar_url).model_dump(mode="json")))
+    return ORJSONResponse(content=ok_json(AvatarUploadResponse(upload_url=upload_data["upload_url"], avatar_url=avatar_url).model_dump(mode="json")))
