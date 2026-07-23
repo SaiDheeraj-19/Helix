@@ -22,8 +22,8 @@ async def list_user_meetings(
     """List all upcoming meetings across all projects for the current user."""
     from sqlalchemy import select
     from sqlalchemy.orm import selectinload
+
     from src.modules.meetings.models import Meeting, MeetingAttendee
-    from src.modules.projects.models import Project
 
     # Find all meetings where the user is an attendee
     result = await db.execute(
