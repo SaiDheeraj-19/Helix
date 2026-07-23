@@ -6,7 +6,7 @@ Uses Pydantic Settings for type-safe environment variable management.
 from functools import lru_cache
 from typing import Any, Literal
 
-from pydantic import PostgresDsn, RedisDsn, field_validator
+from pydantic import PostgresDsn, RedisDsn, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -69,6 +69,7 @@ class Settings(BaseSettings):
     MINIO_BUCKET_DOCUMENTS: str = "helix-documents"
     MINIO_USE_SSL: bool = False
     MINIO_PUBLIC_URL: str = "http://localhost:9000"
+    MINIO_ENABLED: bool = True  # Set to False when no real MinIO/S3 is available
 
     # ─────────────────────────────────────────────
     # Qdrant
@@ -159,21 +160,56 @@ class Settings(BaseSettings):
     # ─────────────────────────────────────────────
     SENTRY_DSN: str = ""
 
+    @model_validator(mode="before")
+    @classmethod
+    def parse_cors_and_db(cls, values: Any) -> Any:
+        # ── Fix CORS_ORIGINS ────────────────────────────────────────────────
+        cors = values.get("CORS_ORIGINS") or values.get("cors_origins")
+        if cors is not None and not isinstance(cors, list):
+            import json
+            stripped = str(cors).strip()
+            if stripped.startswith("["):
+                try:
+                    cors = json.loads(stripped)
+                except json.JSONDecodeError:
+                    cors = [s.strip() for s in stripped.split(",") if s.strip()]
+            else:
+                # plain string like "*" or "http://a.com,http://b.com"
+                cors = [s.strip() for s in stripped.split(",") if s.strip()]
+            values["CORS_ORIGINS"] = cors
+            values["cors_origins"] = cors
+
+        # ── Fix DATABASE_URL dialect for asyncpg ────────────────────────────
+        db_url = values.get("DATABASE_URL") or values.get("database_url")
+        if db_url is not None:
+            db_url_str = str(db_url)
+            if db_url_str.startswith("postgresql://") or db_url_str.startswith("postgres://"):
+                db_url_str = db_url_str.replace("postgresql://", "postgresql+asyncpg://", 1)
+                db_url_str = db_url_str.replace("postgres://", "postgresql+asyncpg://", 1)
+                values["DATABASE_URL"] = db_url_str
+                values["database_url"] = db_url_str
+
+        # ── Auto-disable MinIO when endpoint is dummy ───────────────────────
+        minio_ep = values.get("MINIO_ENDPOINT") or values.get("minio_endpoint", "")
+        if str(minio_ep).lower() in ("dummy", "", "none"):
+            values["MINIO_ENABLED"] = False
+            values["minio_enabled"] = False
+
+        return values
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v: Any) -> list[str]:
         if isinstance(v, list):
             return v
         if isinstance(v, str):
+            import json
             stripped = v.strip()
-            # Handle JSON array format: ["http://localhost:3000","http://localhost:3001"]
             if stripped.startswith("["):
-                import json
                 try:
                     return json.loads(stripped)
                 except json.JSONDecodeError:
                     pass
-            # Handle comma-separated format
             return [origin.strip() for origin in stripped.split(",") if origin.strip()]
         return v
 

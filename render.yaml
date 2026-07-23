@@ -19,6 +19,8 @@ services:
         sync: false
       - key: MINIO_SECURE
         sync: false
+      - key: MINIO_ENABLED
+        value: "false"
       - key: SECRET_KEY
         generateValue: true
       - key: ENVIRONMENT

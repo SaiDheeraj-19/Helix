@@ -31,32 +31,40 @@ def _create_s3_client():
 async def init_minio() -> None:
     """Initialize MinIO and create required buckets."""
     global _s3_client
-    _s3_client = _create_s3_client()
 
-    buckets = [
-        settings.MINIO_BUCKET_ATTACHMENTS,
-        settings.MINIO_BUCKET_AVATARS,
-        settings.MINIO_BUCKET_DOCUMENTS,
-    ]
+    if not settings.MINIO_ENABLED:
+        logger.warning("minio_disabled", reason="MINIO_ENDPOINT is 'dummy' or not configured")
+        return
 
-    for bucket in buckets:
-        try:
-            _s3_client.head_bucket(Bucket=bucket)
-            logger.debug("minio_bucket_exists", bucket=bucket)
-        except ClientError as e:
-            if e.response["Error"]["Code"] == "404":
-                _s3_client.create_bucket(Bucket=bucket)
-                logger.info("minio_bucket_created", bucket=bucket)
-            else:
-                logger.error("minio_bucket_error", bucket=bucket, error=str(e))
-                raise
+    try:
+        _s3_client = _create_s3_client()
 
-    logger.info("minio_initialized")
+        buckets = [
+            settings.MINIO_BUCKET_ATTACHMENTS,
+            settings.MINIO_BUCKET_AVATARS,
+            settings.MINIO_BUCKET_DOCUMENTS,
+        ]
+
+        for bucket in buckets:
+            try:
+                _s3_client.head_bucket(Bucket=bucket)
+                logger.debug("minio_bucket_exists", bucket=bucket)
+            except ClientError as e:
+                if e.response["Error"]["Code"] == "404":
+                    _s3_client.create_bucket(Bucket=bucket)
+                    logger.info("minio_bucket_created", bucket=bucket)
+                else:
+                    logger.error("minio_bucket_error", bucket=bucket, error=str(e))
+
+        logger.info("minio_initialized")
+    except Exception as exc:
+        logger.warning("minio_init_failed", error=str(exc), reason="File uploads will be unavailable")
+        _s3_client = None
 
 
 def get_s3_client():
     if _s3_client is None:
-        raise RuntimeError("MinIO client not initialized. Call init_minio() first.")
+        return None  # Callers should handle None gracefully
     return _s3_client
 
 
