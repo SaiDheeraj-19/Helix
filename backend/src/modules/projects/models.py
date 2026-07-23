@@ -158,7 +158,9 @@ class Label(HelixBase, Base):
     project: Mapped["Project"] = relationship("Project", back_populates="labels")
 
 
-class StickyNote(HelixBase, Base):
+from src.infrastructure.database.mixins import AuditMixin
+
+class StickyNote(HelixBase, AuditMixin, Base):
     """
     Collaborative developer sticky notes (whiteboard view).
     Real-time synchronization happens via x, y coordinates.

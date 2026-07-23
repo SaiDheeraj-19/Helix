@@ -57,8 +57,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             await session.flush()
 
         # Create default workspace if it doesn't exist
-        result = await session.execute(select(Workspace).where(Workspace.slug == "default"))
-        ws = result.scalar_one_or_none()
+        ws_result = await session.execute(select(Workspace).where(Workspace.slug == "default"))
+        ws = ws_result.scalar_one_or_none()
         if not ws:
             ws = Workspace(organization_id=org.id, name="Default Workspace", slug="default", description="Global default workspace")
             session.add(ws)

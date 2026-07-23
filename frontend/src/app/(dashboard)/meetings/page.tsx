@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Video, Calendar as CalendarIcon, Users, ExternalLink, Link as LinkIcon, Loader2 } from "lucide-react";
 import { api } from "@/lib/api-client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials, getUserColor } from "@/lib/utils";
 
 interface Meeting {
@@ -72,14 +71,13 @@ export default function MeetingsPage() {
                   <div className="flex items-center space-x-2 mt-4">
                     <div className="flex -space-x-2">
                       {meeting.attendees?.slice(0, 4).map((att, i) => (
-                        <Avatar key={att.user.id} className="w-7 h-7 border-2 border-[var(--color-surface)]">
-                          <AvatarFallback 
-                            className="text-[10px]"
-                            style={{ backgroundColor: getUserColor(att.user.id), color: "white" }}
-                          >
-                            {getInitials(att.user.display_name)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <div 
+                          key={att.user.id} 
+                          className="w-7 h-7 rounded-full border-2 border-[var(--color-surface)] flex items-center justify-center text-[10px] font-medium text-white"
+                          style={{ backgroundColor: getUserColor(att.user.id) }}
+                        >
+                          {getInitials(att.user.display_name)}
+                        </div>
                       ))}
                       {meeting.attendees?.length > 4 && (
                         <div className="w-7 h-7 rounded-full bg-[var(--color-background)] border-2 border-[var(--color-surface)] flex items-center justify-center text-[10px] font-medium text-[var(--color-foreground)]">
