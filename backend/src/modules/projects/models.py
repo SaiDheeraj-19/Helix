@@ -156,3 +156,24 @@ class Label(HelixBase, Base):
     parent_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("labels.id", ondelete="SET NULL"), nullable=True)
 
     project: Mapped["Project"] = relationship("Project", back_populates="labels")
+
+
+class StickyNote(HelixBase, Base):
+    """
+    Collaborative developer sticky notes (whiteboard view).
+    Real-time synchronization happens via x, y coordinates.
+    """
+
+    __tablename__ = "sticky_notes"
+    __table_args__ = (Index("ix_sticky_notes_project", "project_id"),)
+
+    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    color: Mapped[str] = mapped_column(String(20), default="#FEF3C7", nullable=False)  # amber-100 default
+    
+    # Position on infinite canvas
+    position_x: Mapped[float] = mapped_column(Integer, default=0, nullable=False)
+    position_y: Mapped[float] = mapped_column(Integer, default=0, nullable=False)
+    z_index: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+
+    project: Mapped["Project"] = relationship("Project")

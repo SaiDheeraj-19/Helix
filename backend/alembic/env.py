@@ -31,7 +31,7 @@ from src.modules.workspaces.models import Workspace  # noqa: F401
 
 # Phase 2 models
 from src.modules.projects.models import (  # noqa: F401
-    Project, ProjectMember, IssueState, Label,
+    Project, ProjectMember, IssueState, Label, StickyNote,
 )
 from src.modules.issues.models import (  # noqa: F401
     Issue, IssueAssignee, IssueLabelLink,
@@ -39,6 +39,7 @@ from src.modules.issues.models import (  # noqa: F401
 )
 from src.modules.notifications.models import InAppNotification  # noqa: F401
 from src.modules.cycles.models import Cycle, CycleIssue  # noqa: F401
+from src.modules.meetings.models import Meeting, MeetingAttendee  # noqa: F401
 
 
 # Set target metadata

@@ -44,6 +44,12 @@ export function useProjectWebSocket(projectId: string | null) {
               queryKey: ["comments", (msg.data as any).issue_id],
             });
             break;
+            
+          case "note.created":
+          case "note.updated":
+          case "note.deleted":
+            queryClient.invalidateQueries({ queryKey: ["notes", projectId] });
+            break;
 
           default:
             break;

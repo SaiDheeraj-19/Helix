@@ -95,9 +95,11 @@ def _register_routers(app: FastAPI) -> None:
     from src.modules.auth.router import router as auth_router
     from src.modules.cycles.router import router as cycles_router
     from src.modules.issues.router import router as issues_router
+    from src.modules.meetings.router import router as meetings_router
     from src.modules.notifications.router import router as notifications_router
     from src.modules.organizations.router import router as orgs_router
     from src.modules.projects.router import router as projects_router
+    from src.modules.projects.notes_router import router as notes_router
     from src.modules.realtime.router import router as realtime_router
     from src.modules.users.router import router as users_router
     from src.modules.workspaces.router import router as workspaces_router
@@ -109,7 +111,9 @@ def _register_routers(app: FastAPI) -> None:
     app.include_router(orgs_router, prefix=api_prefix)
     app.include_router(workspaces_router, prefix=api_prefix)
     app.include_router(projects_router, prefix=api_prefix)
+    app.include_router(notes_router, prefix=api_prefix)
     app.include_router(issues_router, prefix=api_prefix)
+    app.include_router(meetings_router, prefix=api_prefix)
     app.include_router(realtime_router, prefix=api_prefix)
     app.include_router(notifications_router, prefix=api_prefix)
     app.include_router(cycles_router, prefix=api_prefix)

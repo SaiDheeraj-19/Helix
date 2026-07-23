@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/common/AppSidebar";
 import { AppTopbar } from "@/components/common/AppTopbar";
 import { CommandPalette } from "@/components/common/CommandPalette";
 import { CreateIssueModal } from "@/components/issues/CreateIssueModal";
+import { CreateMeetingModal } from "@/components/meetings/CreateMeetingModal";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -117,6 +118,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* ── Create Issue Modal ───────────────────────────── */}
       <CreateIssueModal />
+
+      {/* ── Create Meeting Modal ─────────────────────────── */}
+      <CreateMeetingModal />
     </div>
   );
 }

@@ -20,6 +20,10 @@ interface UIState {
   createIssueProjectId: string | null;
   createIssueStateId?: string | null;
 
+  // Create Meeting Modal
+  createMeetingOpen: boolean;
+  createMeetingProjectId: string | null;
+
   // Notifications panel
   notificationsPanelOpen: boolean;
 
@@ -33,6 +37,8 @@ interface UIState {
   closeCommandPalette: () => void;
   openCreateIssue: (projectId?: string, stateId?: string) => void;
   closeCreateIssue: () => void;
+  openCreateMeeting: (projectId: string) => void;
+  closeCreateMeeting: () => void;
   toggleNotifications: () => void;
   setActiveView: (view: ViewType) => void;
 }
@@ -45,6 +51,8 @@ export const useUIStore = create<UIState>()(
     createIssueOpen: false,
     createIssueProjectId: null,
     createIssueStateId: null,
+    createMeetingOpen: false,
+    createMeetingProjectId: null,
     notificationsPanelOpen: false,
     activeView: "list",
 
@@ -79,6 +87,18 @@ export const useUIStore = create<UIState>()(
       set((s) => {
         s.createIssueOpen = false;
         s.createIssueProjectId = null;
+      }),
+
+    openCreateMeeting: (projectId) =>
+      set((s) => {
+        s.createMeetingOpen = true;
+        s.createMeetingProjectId = projectId;
+      }),
+
+    closeCreateMeeting: () =>
+      set((s) => {
+        s.createMeetingOpen = false;
+        s.createMeetingProjectId = null;
       }),
 
     toggleNotifications: () =>
