@@ -122,7 +122,7 @@ async def _complete_text(prompt: str, system: str = "") -> str:
             resp = await client.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers=headers,
-                json={"model": "llama3-8b-8192", "messages": messages},
+                json={"model": "llama-3.1-8b-instant", "messages": messages},
             )
             resp.raise_for_status()
             return str(resp.json()["choices"][0]["message"]["content"])
@@ -163,7 +163,7 @@ async def chat(request: ChatRequest, current_user_id: CurrentUserID) -> Any:
         except Exception:
             # Fallback to Groq
             try:
-                async for chunk in _groq_stream(messages, "llama3-8b-8192"):
+                async for chunk in _groq_stream(messages, "llama-3.1-8b-instant"):
                     yield chunk
             except Exception as e:
                 yield f"data: {json.dumps({'error': str(e)})}\n\n"
