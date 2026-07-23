@@ -24,6 +24,7 @@ from src.infrastructure.database.mixins import AuditMixin, HelixBase
 if TYPE_CHECKING:
     from src.modules.users.models import User
     from src.modules.workspaces.models import Workspace
+    from src.modules.cycles.models import Cycle
 
 
 class ProjectStatus(StrEnum):
@@ -88,6 +89,7 @@ class Project(HelixBase, AuditMixin, Base):
     members: Mapped[list["ProjectMember"]] = relationship("ProjectMember", back_populates="project", cascade="all, delete-orphan")
     states: Mapped[list["IssueState"]] = relationship("IssueState", back_populates="project", cascade="all, delete-orphan")
     labels: Mapped[list["Label"]] = relationship("Label", back_populates="project", cascade="all, delete-orphan")
+    cycles: Mapped[list["Cycle"]] = relationship("Cycle", back_populates="project", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<Project identifier={self.identifier} name={self.name}>"
