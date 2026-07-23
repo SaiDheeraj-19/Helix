@@ -158,13 +158,15 @@ export function AppTopbar() {
               aria-label="Open user menu"
             >
               {profile?.avatar_url ? (
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={profile.avatar_url}
-                  alt={profile.display_name || ""}
-                  className="w-6 h-6 rounded-full object-cover"
-                  style={{ border: "1px solid rgb(var(--color-border))" }}
-                />
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.display_name || ""}
+                    className="w-6 h-6 rounded-full object-cover"
+                    style={{ border: "1px solid rgb(var(--color-border))" }}
+                  />
+                </>
               ) : (
                 <div
                   className={cn(
@@ -197,13 +199,15 @@ export function AppTopbar() {
               >
                 <div className="flex items-center gap-2.5">
                   {profile?.avatar_url ? (
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={profile.avatar_url}
-                      alt={profile?.display_name || ""}
-                      className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                      style={{ border: "1px solid rgb(var(--color-border))" }}
-                    />
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={profile.avatar_url}
+                        alt={profile?.display_name || ""}
+                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                        style={{ border: "1px solid rgb(var(--color-border))" }}
+                      />
+                    </>
                   ) : (
                     <div
                       className={cn(
