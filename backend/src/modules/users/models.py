@@ -55,7 +55,7 @@ class User(HelixBase, Base):
     # Relationships
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
     oauth_accounts: Mapped[list["OAuthAccount"]] = relationship("OAuthAccount", back_populates="user", cascade="all, delete-orphan")
-    org_memberships: Mapped[list["OrgMembership"]] = relationship("OrgMembership", back_populates="user")
+    org_memberships: Mapped[list["OrgMembership"]] = relationship("OrgMembership", foreign_keys="[OrgMembership.user_id]", back_populates="user")
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email}>"
