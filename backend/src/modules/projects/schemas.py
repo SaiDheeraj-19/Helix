@@ -11,6 +11,7 @@ class ProjectCreate(BaseModel):
     identifier: str = Field(min_length=1, max_length=10)
     description: str | None = Field(None, max_length=5000)
     icon: str | None = Field(None, max_length=10)
+    cover_image: str | None = Field(None, max_length=2000)
     color: str = Field("#6366f1", pattern=r"^#[0-9a-fA-F]{6}$")
     network: str = Field("secret")
 
@@ -24,6 +25,7 @@ class ProjectUpdate(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=255)
     description: str | None = Field(None, max_length=5000)
     icon: str | None = Field(None, max_length=10)
+    cover_image: str | None = Field(None, max_length=2000)
     color: str | None = Field(None, pattern=r"^#[0-9a-fA-F]{6}$")
     network: str | None = None
     status: str | None = None
@@ -37,6 +39,7 @@ class ProjectResponse(BaseModel):
     identifier: str
     description: str | None = None
     icon: str | None = None
+    cover_image: str | None = None
     color: str
     status: str
     network: str

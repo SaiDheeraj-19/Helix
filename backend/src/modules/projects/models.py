@@ -73,6 +73,7 @@ class Project(HelixBase, AuditMixin, Base):
     )
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     icon: Mapped[str | None] = mapped_column(String(10), nullable=True)  # emoji
+    cover_image: Mapped[str | None] = mapped_column(String(2000), nullable=True)
     color: Mapped[str] = mapped_column(String(20), default="#6366f1", nullable=False)
 
     status: Mapped[str] = mapped_column(String(30), default=ProjectStatus.ACTIVE, nullable=False, index=True)
