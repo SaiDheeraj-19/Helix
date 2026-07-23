@@ -76,7 +76,25 @@ class OrgService:
             )
             self._db.add(user)
             await self._db.flush()
-            logger.info("Sending workspace invite email", email=email, org=org_slug)
+            
+            # Send Email
+            from src.infrastructure.email.client import send_email
+            from src.core.config import settings
+            
+            invite_link = f"https://helix-seven-orpin.vercel.app/register?email={email}&org={org_slug}"
+            subject = f"You've been invited to join the {org.name} Workspace on Helix"
+            body = (
+                f"Hello!\n\n"
+                f"You have been invited to join the '{org.name}' workspace on Helix as a {role}.\n\n"
+                f"Helix is an enterprise project management platform. To accept your invitation and join the workspace, "
+                f"please click the link below to set up your account:\n\n"
+                f"{invite_link}\n\n"
+                f"Welcome aboard,\n"
+                f"The Helix Team"
+            )
+            
+            # Run this in the background (we can just await it since it's a fast mock for now)
+            await send_email(to_email=email, subject=subject, body=body)
 
         # Check existing membership
         existing = await self._db.execute(select(OrgMembership).where(OrgMembership.organization_id == org.id, OrgMembership.user_id == user.id))
