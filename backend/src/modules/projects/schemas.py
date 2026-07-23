@@ -1,4 +1,5 @@
 """Helix — Projects Module: Schemas"""
+import uuid
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -29,8 +30,8 @@ class ProjectUpdate(BaseModel):
 
 
 class ProjectResponse(BaseModel):
-    id: str
-    workspace_id: str
+    id: uuid.UUID
+    workspace_id: uuid.UUID
     name: str
     slug: str
     identifier: str
@@ -57,8 +58,8 @@ class IssueStateCreate(BaseModel):
 
 
 class IssueStateResponse(BaseModel):
-    id: str
-    project_id: str
+    id: uuid.UUID
+    project_id: uuid.UUID
     name: str
     color: str
     group: str
@@ -76,16 +77,16 @@ class LabelCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     color: str = Field(pattern=r"^#[0-9a-fA-F]{6}$")
     description: str | None = Field(None, max_length=255)
-    parent_id: str | None = None
+    parent_id: uuid.UUID | None = None
 
 
 class LabelResponse(BaseModel):
-    id: str
-    project_id: str
+    id: uuid.UUID
+    project_id: uuid.UUID
     name: str
     color: str
     description: str | None = None
-    parent_id: str | None = None
+    parent_id: uuid.UUID | None = None
 
     model_config = {"from_attributes": True}
 
@@ -94,8 +95,8 @@ class LabelResponse(BaseModel):
 
 
 class ProjectMemberResponse(BaseModel):
-    id: str
-    user_id: str
+    id: uuid.UUID
+    user_id: uuid.UUID
     display_name: str
     email: str
     avatar_url: str | None = None

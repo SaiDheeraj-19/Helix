@@ -3,6 +3,7 @@ Helix — Auth Module: Pydantic Schemas
 """
 
 import re
+import uuid
 
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
@@ -102,7 +103,7 @@ class TokenResponse(BaseModel):
 
 
 class AuthUserResponse(BaseModel):
-    id: str
+    id: uuid.UUID
     email: str
     username: str
     display_name: str

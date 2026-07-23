@@ -1,10 +1,12 @@
 """Helix — Users Module: Schemas"""
 
+import uuid
+
 from pydantic import BaseModel, Field
 
 
 class UserResponse(BaseModel):
-    id: str
+    id: uuid.UUID
     email: str
     username: str
     display_name: str

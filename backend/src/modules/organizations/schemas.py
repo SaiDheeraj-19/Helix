@@ -1,13 +1,14 @@
 from typing import Any
 
 """Helix — Organizations Module: Schemas"""
+import uuid
 
 from pydantic import BaseModel, Field, field_validator
 from slugify import slugify
 
 
 class OrgResponse(BaseModel):
-    id: str
+    id: uuid.UUID
     name: str
     slug: str
     description: str | None = None
@@ -30,8 +31,8 @@ class CreateOrgRequest(BaseModel):
 
 
 class OrgMemberResponse(BaseModel):
-    id: str
-    user_id: str
+    id: uuid.UUID
+    user_id: uuid.UUID
     display_name: str
     email: str
     avatar_url: str | None = None

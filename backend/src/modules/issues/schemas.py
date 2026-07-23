@@ -1,4 +1,5 @@
 """Helix — Issues Module: Schemas"""
+import uuid
 
 from pydantic import BaseModel, Field
 
@@ -6,7 +7,7 @@ from pydantic import BaseModel, Field
 
 
 class StateSlim(BaseModel):
-    id: str
+    id: uuid.UUID
     name: str
     color: str
     group: str
@@ -14,7 +15,7 @@ class StateSlim(BaseModel):
 
 
 class UserSlim(BaseModel):
-    id: str
+    id: uuid.UUID
     display_name: str
     email: str
     avatar_url: str | None = None
@@ -22,7 +23,7 @@ class UserSlim(BaseModel):
 
 
 class LabelSlim(BaseModel):
-    id: str
+    id: uuid.UUID
     name: str
     color: str
     model_config = {"from_attributes": True}
@@ -36,10 +37,10 @@ class IssueCreate(BaseModel):
     description: str | None = None
     description_html: str | None = None
     priority: str = Field("none")
-    state_id: str | None = None  # uses project default if None
+    state_id: uuid.UUID | None = None  # uses project default if None
     assignee_ids: list[str] = Field(default_factory=list)
     label_ids: list[str] = Field(default_factory=list)
-    parent_id: str | None = None
+    parent_id: uuid.UUID | None = None
     estimate: float | None = Field(None, ge=0)
     due_date: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     started_at: str | None = None
@@ -50,10 +51,10 @@ class IssueUpdate(BaseModel):
     description: str | None = None
     description_html: str | None = None
     priority: str | None = None
-    state_id: str | None = None
+    state_id: uuid.UUID | None = None
     assignee_ids: list[str] | None = None
     label_ids: list[str] | None = None
-    parent_id: str | None = None
+    parent_id: uuid.UUID | None = None
     estimate: float | None = None
     due_date: str | None = None
     started_at: str | None = None
@@ -62,9 +63,9 @@ class IssueUpdate(BaseModel):
 
 
 class IssueResponse(BaseModel):
-    id: str
-    workspace_id: str
-    project_id: str
+    id: uuid.UUID
+    workspace_id: uuid.UUID
+    project_id: uuid.UUID
     sequence_id: int
     title: str
     description: str | None = None
@@ -73,7 +74,7 @@ class IssueResponse(BaseModel):
     state: StateSlim
     assignees: list[UserSlim] = Field(default_factory=list)
     labels: list[LabelSlim] = Field(default_factory=list)
-    parent_id: str | None = None
+    parent_id: uuid.UUID | None = None
     estimate: float | None = None
     due_date: str | None = None
     started_at: str | None = None
@@ -95,14 +96,14 @@ class IssueFilters(BaseModel):
     assignee_ids: list[str] = Field(default_factory=list)
     label_ids: list[str] = Field(default_factory=list)
     search: str | None = None
-    parent_id: str | None = None  # filter by subtasks
+    parent_id: uuid.UUID | None = None  # filter by subtasks
     order_by: str = Field("-created_at")  # prefix - for DESC
 
 
 class IssueMoveRequest(BaseModel):
     """Reorder/move an issue in the board."""
 
-    state_id: str
+    state_id: uuid.UUID
     sort_order: float
 
 
@@ -120,8 +121,8 @@ class CommentUpdate(BaseModel):
 
 
 class CommentResponse(BaseModel):
-    id: str
-    issue_id: str
+    id: uuid.UUID
+    issue_id: uuid.UUID
     content: str
     content_html: str
     actor: UserSlim
@@ -136,8 +137,8 @@ class CommentResponse(BaseModel):
 
 
 class ActivityResponse(BaseModel):
-    id: str
-    issue_id: str
+    id: uuid.UUID
+    issue_id: uuid.UUID
     field: str
     old_value: str | None = None
     new_value: str | None = None
@@ -159,14 +160,14 @@ class AttachmentUploadRequest(BaseModel):
 
 
 class AttachmentUploadResponse(BaseModel):
-    attachment_id: str
+    attachment_id: uuid.UUID
     upload_url: str
     storage_key: str
 
 
 class AttachmentResponse(BaseModel):
-    id: str
-    issue_id: str
+    id: uuid.UUID
+    issue_id: uuid.UUID
     file_name: str
     file_size: int
     content_type: str

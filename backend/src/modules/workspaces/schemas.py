@@ -1,12 +1,13 @@
 """Helix — Workspaces Module: Schemas, Service, Router"""
-# schemas.py
+import uuid
 
+# schemas.py
 from pydantic import BaseModel, Field
 
 
 class WorkspaceResponse(BaseModel):
-    id: str
-    organization_id: str
+    id: uuid.UUID
+    organization_id: uuid.UUID
     name: str
     slug: str
     description: str | None = None

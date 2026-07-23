@@ -50,7 +50,7 @@ class IssueService:
         # Resolve state
         state_id: uuid.UUID
         if data.state_id:
-            state_id = uuid.UUID(data.state_id)
+            state_id = data.state_id
         else:
             default_state = await self._project_service.get_default_state(project_id)
             state_id = default_state.id
@@ -78,7 +78,7 @@ class IssueService:
             description_html=data.description_html,
             priority=data.priority,
             state_id=state_id,
-            parent_id=uuid.UUID(data.parent_id) if data.parent_id else None,
+            parent_id=data.parent_id,
             estimate=data.estimate,
             due_date=data.due_date,
             started_at=data.started_at,
@@ -156,7 +156,7 @@ class IssueService:
         if filters.label_ids:
             query = query.join(IssueLabelLink).where(IssueLabelLink.label_id.in_([uuid.UUID(l) for l in filters.label_ids]))
         if filters.parent_id:
-            query = query.where(Issue.parent_id == uuid.UUID(filters.parent_id))
+            query = query.where(Issue.parent_id == filters.parent_id)
         elif not filters.parent_id:
             query = query.where(Issue.parent_id.is_(None))  # top-level only by default
         if filters.search:

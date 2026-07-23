@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 from datetime import date
 
 from pydantic import BaseModel, Field
@@ -23,9 +24,9 @@ class CycleUpdate(BaseModel):
 
 
 class CycleResponse(BaseModel):
-    id: str
-    project_id: str
-    workspace_id: str
+    id: uuid.UUID
+    project_id: uuid.UUID
+    workspace_id: uuid.UUID
     name: str
     description: str | None = None
     status: str
