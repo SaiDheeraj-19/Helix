@@ -34,6 +34,16 @@ def _get_request_meta(request: Request) -> dict[str, Any]:
     }
 
 
+def _is_secure(request: Request) -> bool:
+    """Determine if the cookie should be secure (SameSite=None)."""
+    return (
+        settings.is_production
+        or settings.APP_URL.startswith("https")
+        or request.headers.get("origin", "").startswith("https")
+        or request.headers.get("x-forwarded-proto") == "https"
+    )
+
+
 # ─────────────────────────────────────────────
 # OAuth — Google & GitHub
 # ─────────────────────────────────────────────
@@ -101,8 +111,8 @@ async def oauth_google_callback(
             key="refresh_token",
             value=login_resp.tokens.refresh_token,
             httponly=True,
-            secure=settings.is_production,
-            samesite="none" if settings.is_production else "lax",
+            secure=_is_secure(request),
+            samesite="none" if _is_secure(request) else "lax",
             max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
         )
         return response
@@ -177,8 +187,8 @@ async def oauth_github_callback(
             key="refresh_token",
             value=login_resp.tokens.refresh_token,
             httponly=True,
-            secure=settings.is_production,
-            samesite="none" if settings.is_production else "lax",
+            secure=_is_secure(request),
+            samesite="none" if _is_secure(request) else "lax",
             max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
         )
         return response
@@ -220,8 +230,8 @@ async def register(
         key="refresh_token",
         value=result.tokens.refresh_token,
         httponly=True,
-        secure=settings.is_production,
-        samesite="none" if settings.is_production else "lax",
+        secure=_is_secure(request),
+        samesite="none" if _is_secure(request) else "lax",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
     )
     return response
@@ -243,8 +253,8 @@ async def login(
         key="refresh_token",
         value=result.tokens.refresh_token,
         httponly=True,
-        secure=settings.is_production,
-        samesite="none" if settings.is_production else "lax",
+        secure=_is_secure(request),
+        samesite="none" if _is_secure(request) else "lax",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
     )
     return response
@@ -275,8 +285,8 @@ async def refresh_token(
         key="refresh_token",
         value=result.refresh_token,
         httponly=True,
-        secure=settings.is_production,
-        samesite="none" if settings.is_production else "lax",
+        secure=_is_secure(request),
+        samesite="none" if _is_secure(request) else "lax",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
     )
     return response
@@ -295,7 +305,7 @@ async def logout(
         await service.logout(refresh_token)
 
     response = ORJSONResponse(content=ok_json({"message": "Logged out successfully"}))
-    response.delete_cookie(key="refresh_token", httponly=True, secure=settings.is_production, samesite="lax")
+    response.delete_cookie(key="refresh_token", httponly=True, secure=_is_secure(request), samesite="none" if _is_secure(request) else "lax")
     return response
 
 
@@ -310,7 +320,7 @@ async def logout_all(
     service = AuthService(db)
     result = await service.logout_all_devices(current_user_id)
     response = ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
-    response.delete_cookie(key="refresh_token", httponly=True, secure=settings.is_production, samesite="lax")
+    response.delete_cookie(key="refresh_token", httponly=True, secure=_is_secure(request), samesite="none" if _is_secure(request) else "lax")
     return response
 
 
