@@ -94,7 +94,7 @@ async def update_cycle(cycle_id: UUID, data: CycleUpdate, current_user_id: Curre
 
 
 @router.delete("/cycles/{cycle_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def delete_cycle(cycle_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> None:
     svc = CycleService(db)
     await svc.delete(cycle_id)
 
@@ -111,6 +111,6 @@ async def add_issues(cycle_id: UUID, data: CycleIssueAdd, current_user_id: Curre
 
 
 @router.delete("/cycles/{cycle_id}/issues/{issue_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_issue(cycle_id: UUID, issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def remove_issue_from_cycle(cycle_id: UUID, issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> None:
     svc = CycleService(db)
     await svc.remove_issue(cycle_id, issue_id)

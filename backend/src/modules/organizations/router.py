@@ -88,6 +88,6 @@ async def update_member(slug: str, membership_id: UUID, data: UpdateMemberRoleRe
 
 
 @router.delete("/{slug}/members/{membership_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_member(slug: str, membership_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def remove_member(slug: str, membership_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> None:
     service = OrgService(db)
     await service.remove_member(slug, membership_id)

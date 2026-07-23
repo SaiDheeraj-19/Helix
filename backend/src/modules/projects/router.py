@@ -96,7 +96,7 @@ async def update_project(project_id: UUID, data: ProjectUpdate, current_user_id:
 
 
 @router.delete("/projects/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_project(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def delete_project(project_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> None:
     service = ProjectService(db)
     await service.delete(project_id, current_user_id)
 

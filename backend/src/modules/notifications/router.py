@@ -59,7 +59,7 @@ async def list_notifications(
 
 
 @router.post("/{notification_id}/read", status_code=status.HTTP_204_NO_CONTENT)
-async def mark_read(notification_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def mark_read(notification_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> None:
     """Mark a single notification as read."""
     await db.execute(
         update(InAppNotification)
@@ -73,7 +73,7 @@ async def mark_read(notification_id: UUID, current_user_id: CurrentUserID, db: D
 
 
 @router.post("/read-all", status_code=status.HTTP_204_NO_CONTENT)
-async def mark_all_read(current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def mark_all_read(current_user_id: CurrentUserID, db: DBSession) -> None:
     """Mark all notifications as read."""
     now = datetime.now(tz=UTC).isoformat()
     await db.execute(

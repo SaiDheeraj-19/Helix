@@ -110,7 +110,7 @@ async def update_issue(
 
 
 @router.delete("/issues/{issue_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def delete_issue(issue_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> None:
     service = IssueService(db)
     await service.delete(issue_id, current_user_id)
 
@@ -164,7 +164,7 @@ async def update_comment(comment_id: UUID, data: CommentUpdate, current_user_id:
 
 
 @router.delete("/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_comment(comment_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> Any:
+async def delete_comment(comment_id: UUID, current_user_id: CurrentUserID, db: DBSession) -> None:
     service = IssueService(db)
     await service.delete_comment(comment_id)
 
