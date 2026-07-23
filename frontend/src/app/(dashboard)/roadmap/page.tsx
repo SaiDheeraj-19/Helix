@@ -71,7 +71,7 @@ export default function RoadmapPage() {
             Visual Roadmap (Coming Soon)
           </h2>
           <p className="text-sm leading-relaxed mb-8 max-w-md mx-auto" style={{ color: "rgb(var(--color-foreground-muted))" }}>
-            We're building a powerful Gantt-style roadmap to help you visualize timelines, dependencies, and high-level project goals across your entire workspace.
+            We&apos;re building a powerful Gantt-style roadmap to help you visualize timelines, dependencies, and high-level project goals across your entire workspace.
           </p>
           
           <div 

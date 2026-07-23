@@ -90,15 +90,14 @@ export default function ProjectsPage() {
 
   const watchedName = watch("name", "");
 
-const UNSPLASH_ACCESS_KEY = "LSMSW46oFpj3K0oLqt-M40l_j1Pn1K_Sr_abcg99pww";
-
   const [coverUrl, setCoverUrl] = useState("https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1200&h=400");
   const [isFetchingCover, setIsFetchingCover] = useState(false);
 
   const fetchRandomCover = async () => {
     try {
       setIsFetchingCover(true);
-      const res = await fetch(`https://api.unsplash.com/photos/random?query=landscape,abstract,dark,nature&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`);
+      const accessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY || "";
+      const res = await fetch(`https://api.unsplash.com/photos/random?query=landscape,abstract,dark,nature&orientation=landscape&client_id=${accessKey}`);
       if (res.ok) {
         const data = await res.json();
         setCoverUrl(data.urls.regular);

@@ -83,7 +83,7 @@ export default function MyIssuesPage() {
             No issues assigned to you
           </h2>
           <p className="text-sm leading-relaxed mb-6" style={{ color: "rgb(var(--color-foreground-muted))" }}>
-            You're all caught up! When issues are assigned to you across your workspace, they will appear here.
+            You&apos;re all caught up! When issues are assigned to you across your workspace, they will appear here.
           </p>
           <button
             onClick={() => openCreateIssue()}
