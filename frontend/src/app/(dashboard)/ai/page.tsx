@@ -54,7 +54,8 @@ export default function AIAssistantPage() {
       const token = tokenStore.get();
       const history = [...messages, userMsg].map(m => ({ role: m.role, content: m.content }));
 
-      const res = await fetch("/api/v1/ai/chat", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const res = await fetch(`${apiUrl}/api/v1/ai/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
