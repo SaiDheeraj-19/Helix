@@ -22,9 +22,9 @@ from src.infrastructure.database.base import Base
 from src.infrastructure.database.mixins import AuditMixin, HelixBase
 
 if TYPE_CHECKING:
+    from src.modules.cycles.models import Cycle
     from src.modules.users.models import User
     from src.modules.workspaces.models import Workspace
-    from src.modules.cycles.models import Cycle
 
 
 class ProjectStatus(StrEnum):
