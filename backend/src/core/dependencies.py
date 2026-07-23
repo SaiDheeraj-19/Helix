@@ -8,7 +8,7 @@ from typing import Annotated
 from uuid import UUID
 
 import structlog
-from fastapi import Depends
+from fastapi import Depends, WebSocket
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from redis.asyncio import Redis
@@ -112,7 +112,7 @@ OptionalUserID = Annotated[UUID | None, Depends(get_optional_user_id)]
 
 
 async def get_current_user_ws(
-    websocket: __import__("fastapi").WebSocket,
+    websocket: WebSocket,
 ) -> UUID:
     """
     Extract and validate the JWT access token from the query parameters.

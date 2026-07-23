@@ -17,7 +17,7 @@ logger = structlog.get_logger(__name__)
 # Global redis connection for pub/sub
 _redis_client: Redis | None = None
 _pubsub = None
-_listener_task: asyncio.Task | None = None
+_listener_task: asyncio.Task[Any] | None = None
 
 
 async def get_redis() -> Redis:

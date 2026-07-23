@@ -16,6 +16,7 @@ from src.core.response import ok_json
 from src.modules.auth.schemas import (
     ForgotPasswordRequest,
     LoginRequest,
+    MessageResponse,
     RegisterRequest,
     ResetPasswordRequest,
     VerifyEmailRequest,

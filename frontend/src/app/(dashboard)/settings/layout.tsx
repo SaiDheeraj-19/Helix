@@ -19,7 +19,6 @@ const SETTINGS_NAV = [
     items: [
       { label: "General", href: "/settings/workspace", icon: Building2 },
       { label: "Members", href: "/settings/workspace/members", icon: User },
-      { label: "Billing", href: "/settings/workspace/billing", icon: CreditCard },
     ],
   },
 ];

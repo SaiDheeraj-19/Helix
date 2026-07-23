@@ -66,6 +66,8 @@ class OrgService:
         user = user_result.scalar_one_or_none()
         if not user:
             import uuid
+            import structlog
+            logger = structlog.get_logger(__name__)
             username = f"invited_{uuid.uuid4().hex[:8]}"
             user = User(
                 email=email,
@@ -74,6 +76,7 @@ class OrgService:
             )
             self._db.add(user)
             await self._db.flush()
+            logger.info("Sending workspace invite email", email=email, org=org_slug)
 
         # Check existing membership
         existing = await self._db.execute(select(OrgMembership).where(OrgMembership.organization_id == org.id, OrgMembership.user_id == user.id))

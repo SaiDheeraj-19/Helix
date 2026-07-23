@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, CircleDot, FolderKanban, Repeat2,
   BarChart3, Settings, ChevronDown, Plus,
-  Inbox, Users, Bot, Loader2, Map,
+  Inbox, Users, Bot, Loader2, Map, Video, StickyNote
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui.store";
@@ -29,6 +29,8 @@ const workspaceNavItems = [
   { label: "Projects", href: "/projects", icon: FolderKanban },
   { label: "Cycles", href: "/cycles", icon: Repeat2 },
   { label: "Roadmap", href: "/roadmap", icon: Map },
+  { label: "Meetings", href: "/meetings", icon: Video },
+  { label: "Sticky Notes", href: "/notes", icon: StickyNote },
   { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Members", href: "/settings/workspace/members", icon: Users },
   { label: "AI Assistant", href: "/ai", icon: Bot },
@@ -78,9 +80,6 @@ export function AppSidebar() {
                   style={{ color: "rgb(var(--color-foreground))", letterSpacing: "-0.01em" }}
                 >
                   Helix Workspace
-                </p>
-                <p className="text-[11px] truncate mt-px" style={{ color: "rgb(var(--color-foreground-muted))" }}>
-                  Free plan
                 </p>
               </div>
               <ChevronDown className="w-3 h-3 flex-shrink-0 ml-1" style={{ color: "rgb(var(--color-foreground-muted))" }} />
