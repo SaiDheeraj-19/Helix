@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,7 +39,7 @@ export function CreateIssueModal() {
     queryFn: () => projectsApi.getStates(projectId),
     enabled: isOpen,
   });
-  const states = statesData?.data || [];
+  const states = useMemo(() => statesData?.data || [], [statesData?.data]);
 
   const {
     register,

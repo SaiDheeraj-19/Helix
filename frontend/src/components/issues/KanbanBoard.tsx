@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   DndContext, DragEndEvent, DragOverlay, DragStartEvent,
@@ -42,7 +42,7 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
     queryKey: ["issues", projectId, {}],
     queryFn: () => issuesApi.list(projectId, { per_page: 500 }),
   });
-  const issues: Issue[] = (issuesData?.data as any)?.items || [];
+  const issues: Issue[] = useMemo(() => (issuesData?.data as any)?.items || [], [issuesData?.data]);
 
   const moveMutation = useMutation({
     mutationFn: ({ issueId, stateId, sortOrder }: { issueId: string; stateId: string; sortOrder: number }) =>

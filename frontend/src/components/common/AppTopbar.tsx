@@ -158,6 +158,7 @@ export function AppTopbar() {
               aria-label="Open user menu"
             >
               {profile?.avatar_url ? (
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={profile.avatar_url}
                   alt={profile.display_name || ""}
@@ -196,6 +197,7 @@ export function AppTopbar() {
               >
                 <div className="flex items-center gap-2.5">
                   {profile?.avatar_url ? (
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={profile.avatar_url}
                       alt={profile?.display_name || ""}
