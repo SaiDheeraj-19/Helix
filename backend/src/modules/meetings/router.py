@@ -6,8 +6,8 @@ import uuid
 from typing import Any
 
 from fastapi import APIRouter
-from src.core.dependencies import CurrentUserID, DBSession
 
+from src.core.dependencies import CurrentUserID, DBSession
 from src.modules.meetings.schemas import MeetingCreate, MeetingResponse
 from src.modules.meetings.service import MeetingService
 

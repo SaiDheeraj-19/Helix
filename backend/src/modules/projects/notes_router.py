@@ -8,8 +8,8 @@ from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import delete, select, update
-from src.core.dependencies import CurrentUserID, DBSession
 
+from src.core.dependencies import CurrentUserID, DBSession
 from src.core.exceptions import NotFoundError
 from src.infrastructure.realtime.redis_pubsub import publish_event
 from src.modules.projects.models import StickyNote
