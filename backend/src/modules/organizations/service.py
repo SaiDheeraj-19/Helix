@@ -66,6 +66,7 @@ class OrgService:
         user = user_result.scalar_one_or_none()
         if not user:
             import uuid
+
             import structlog
             logger = structlog.get_logger(__name__)
             username = f"invited_{uuid.uuid4().hex[:8]}"
@@ -76,11 +77,10 @@ class OrgService:
             )
             self._db.add(user)
             await self._db.flush()
-            
+
             # Send Email
             from src.infrastructure.email.client import send_email
-            from src.core.config import settings
-            
+
             invite_link = f"https://helix-seven-orpin.vercel.app/register?email={email}&org={org_slug}"
             subject = f"You've been invited to join the {org.name} Workspace on Helix"
             body = (
@@ -92,7 +92,7 @@ class OrgService:
                 f"Welcome aboard,\n"
                 f"The Helix Team"
             )
-            
+
             # Run this in the background (we can just await it since it's a fast mock for now)
             await send_email(to_email=email, subject=subject, body=body)
 

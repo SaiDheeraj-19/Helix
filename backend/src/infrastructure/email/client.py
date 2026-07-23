@@ -1,7 +1,8 @@
-import structlog
 from email.message import EmailMessage
 
 import aiosmtplib
+import structlog
+
 from src.core.config import settings
 
 logger = structlog.get_logger(__name__)
