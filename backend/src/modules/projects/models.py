@@ -170,7 +170,7 @@ class StickyNote(HelixBase, Base):
     project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     color: Mapped[str] = mapped_column(String(20), default="#FEF3C7", nullable=False)  # amber-100 default
-    
+
     # Position on infinite canvas
     position_x: Mapped[float] = mapped_column(Integer, default=0, nullable=False)
     position_y: Mapped[float] = mapped_column(Integer, default=0, nullable=False)

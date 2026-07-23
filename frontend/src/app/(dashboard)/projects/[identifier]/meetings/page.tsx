@@ -32,7 +32,7 @@ export default function MeetingsPage() {
     queryFn: () => api.get(`/projects/${project!.id}/meetings`),
     enabled: !!project?.id,
   });
-  const meetings = meetingsData?.data || [];
+  const meetings = (meetingsData?.data as any[]) || [];
 
   if (activeMeeting) {
     const meeting = meetings.find((m: any) => m.room_slug === activeMeeting);
@@ -65,6 +65,7 @@ export default function MeetingsPage() {
             }}
             userInfo={{
               displayName: "Helix User",
+              email: "user@helix.app"
             }}
             getIFrameRef={(iframeRef) => {
               iframeRef.style.height = "100%";

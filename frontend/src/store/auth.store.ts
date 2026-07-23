@@ -8,12 +8,13 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  refreshToken: string | null;
+  _hasHydrated: boolean;
 
   // Actions
-  setUser: (user: User, accessToken: string, refreshToken?: string) => void;
+  setUser: (user: User, accessToken: string) => void;
   clearAuth: () => void;
   setLoading: (loading: boolean) => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -22,17 +23,14 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isLoading: true,
-      refreshToken: null,
+      _hasHydrated: false,
 
-      setUser: (user, accessToken, refreshToken) => {
+      setUser: (user, accessToken) => {
         tokenStore.set(accessToken);
         set((state) => {
           state.user = user;
           state.isAuthenticated = true;
           state.isLoading = false;
-          if (refreshToken) {
-            state.refreshToken = refreshToken;
-          }
         });
       },
 
@@ -42,7 +40,6 @@ export const useAuthStore = create<AuthState>()(
           state.user = null;
           state.isAuthenticated = false;
           state.isLoading = false;
-          state.refreshToken = null;
         });
       },
 
@@ -51,6 +48,10 @@ export const useAuthStore = create<AuthState>()(
           state.isLoading = loading;
         });
       },
+      
+      setHasHydrated: (hasHydrated) => {
+        set({ _hasHydrated: hasHydrated });
+      },
     })),
     {
       name: "helix-auth",
@@ -58,12 +59,10 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
-        refreshToken: state.refreshToken,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          // Rehydrate the in-memory access token from localStorage if available
-          // (refresh token is stored in state; new access token will be fetched on next 401)
+          state.setHasHydrated(true);
           state.setLoading(false);
         }
       },

@@ -9,11 +9,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.core.exceptions import ForbiddenError, NotFoundError
-from src.modules.meetings.models import Meeting, MeetingAttendee, MeetingStatus
+from src.modules.meetings.models import Meeting, MeetingAttendee
 from src.modules.meetings.schemas import MeetingCreate
 from src.modules.organizations.models import OrgMembership, OrgRole
 from src.modules.projects.models import Project
-from src.modules.workspaces.models import Workspace
 
 
 class MeetingService:
@@ -28,7 +27,7 @@ class MeetingService:
         project = project_result.scalar_one_or_none()
         if not project:
             raise NotFoundError("Project", str(project_id))
-            
+
         org_id = project.workspace.organization_id
 
         # 2. Check actor's org role

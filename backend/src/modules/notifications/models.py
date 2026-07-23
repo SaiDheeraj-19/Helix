@@ -1,6 +1,6 @@
 """Helix — Notifications Module: Models"""
 
-from enum import Enum as PyEnum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 from uuid import UUID as UUIDType
 
@@ -14,12 +14,12 @@ from src.infrastructure.database.base import Base
 from src.infrastructure.database.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 
-class NotificationType(str, PyEnum):
+class NotificationType(StrEnum):
     ISSUE_ASSIGNED = "issue_assigned"
     ISSUE_MENTIONED = "issue_mentioned"
-    ISSUE_UPDATED = "issue_updated"
+    ISSUE_STATUS_CHANGED = "issue_status_changed"
     COMMENT_ADDED = "comment_added"
-    CYCLE_STARTED = "cycle_started"
+    PROJECT_INVITE = "project_invite"
     INVITATION = "invitation"
 
 

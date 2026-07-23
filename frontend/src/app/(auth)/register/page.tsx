@@ -56,7 +56,7 @@ export default function RegisterPage() {
           password: data.password,
         }
       );
-      setUser(res.data.user, res.data.tokens.access_token, res.data.tokens.refresh_token);
+      setUser(res.data.user, res.data.tokens.access_token);
       toast.success("Account created! Welcome to Helix 🎉");
       router.push("/");
     } catch (err: any) {

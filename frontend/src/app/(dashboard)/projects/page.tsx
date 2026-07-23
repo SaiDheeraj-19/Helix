@@ -92,14 +92,8 @@ export default function ProjectsPage() {
 
 const UNSPLASH_ACCESS_KEY = "LSMSW46oFpj3K0oLqt-M40l_j1Pn1K_Sr_abcg99pww";
 
-// ...
-export default function ProjectsPage() {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const [selectedColor, setSelectedColor] = useState("#6366f1");
   const [coverUrl, setCoverUrl] = useState("https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1200&h=400");
   const [isFetchingCover, setIsFetchingCover] = useState(false);
-  const queryClient = useQueryClient();
 
   const fetchRandomCover = async () => {
     try {
@@ -128,7 +122,7 @@ export default function ProjectsPage() {
 
   const createMutation = useMutation({
     mutationFn: (d: ProjectFormData) =>
-      projectsApi.create(WORKSPACE_SLUG, { ...d, color: selectedColor, cover_image: coverUrl }),
+      projectsApi.create(WORKSPACE_SLUG, { ...d, color: selectedColor }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects", WORKSPACE_SLUG] });
       toast.success("Project created successfully!");
@@ -172,7 +166,7 @@ export default function ProjectsPage() {
                   className="w-full max-w-[720px] rounded-xl border border-border/50 bg-[#151515] shadow-2xl overflow-hidden"
                 >
                   <form
-                    onSubmit={handleSubmit((d) => createMutation.mutate({ ...d, cover_image: coverUrl }))}
+                    onSubmit={handleSubmit((d) => createMutation.mutate(d))}
                     className="flex flex-col"
                   >
                     {/* Cover Photo Area */}

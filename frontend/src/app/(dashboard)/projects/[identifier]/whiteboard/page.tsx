@@ -30,7 +30,7 @@ export default function WhiteboardPage() {
     queryFn: () => api.get(`/projects/${project!.id}/notes`),
     enabled: !!project?.id,
   });
-  const notes = notesData?.data || [];
+  const notes = (notesData?.data as any[]) || [];
 
   // Hook into Realtime Sync for notes
   useProjectWebSocket(project?.id || null);

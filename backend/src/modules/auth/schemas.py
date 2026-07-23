@@ -44,9 +44,6 @@ class LoginRequest(BaseModel):
     remember_me: bool = False
 
 
-class RefreshTokenRequest(BaseModel):
-    refresh_token: str
-
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
@@ -97,7 +94,7 @@ class VerifyEmailRequest(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
-    refresh_token: str
+    refresh_token: str = Field(exclude=True)
     token_type: str = "bearer"
     expires_in: int  # seconds
 

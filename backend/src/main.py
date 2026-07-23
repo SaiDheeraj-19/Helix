@@ -98,8 +98,8 @@ def _register_routers(app: FastAPI) -> None:
     from src.modules.meetings.router import router as meetings_router
     from src.modules.notifications.router import router as notifications_router
     from src.modules.organizations.router import router as orgs_router
-    from src.modules.projects.router import router as projects_router
     from src.modules.projects.notes_router import router as notes_router
+    from src.modules.projects.router import router as projects_router
     from src.modules.realtime.router import router as realtime_router
     from src.modules.users.router import router as users_router
     from src.modules.workspaces.router import router as workspaces_router

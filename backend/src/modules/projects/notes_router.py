@@ -3,35 +3,34 @@ Helix — Sticky Notes API Router
 """
 
 import uuid
-from typing import Any, Optional
+from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import select, update, delete
-from sqlalchemy.orm import selectinload
+from sqlalchemy import delete, select, update
+from src.core.dependencies import CurrentUserID, DBSession
 
-from src.api.dependencies import CurrentUserID, DBSession
 from src.core.exceptions import NotFoundError
 from src.infrastructure.realtime.redis_pubsub import publish_event
-from src.modules.projects.models import Project, StickyNote
+from src.modules.projects.models import StickyNote
 
 router = APIRouter(tags=["Notes"])
 
 
 class StickyNoteCreate(BaseModel):
     content: str
-    color: Optional[str] = "#FEF3C7"
+    color: str | None = "#FEF3C7"
     position_x: float = 0
     position_y: float = 0
     z_index: int = 1
 
 
 class StickyNoteUpdate(BaseModel):
-    content: Optional[str] = None
-    color: Optional[str] = None
-    position_x: Optional[float] = None
-    position_y: Optional[float] = None
-    z_index: Optional[int] = None
+    content: str | None = None
+    color: str | None = None
+    position_x: float | None = None
+    position_y: float | None = None
+    z_index: int | None = None
 
 
 class StickyNoteResponse(BaseModel):
@@ -42,7 +41,7 @@ class StickyNoteResponse(BaseModel):
     position_x: float
     position_y: float
     z_index: int
-    created_by: Optional[uuid.UUID] = None
+    created_by: uuid.UUID | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -109,7 +108,7 @@ async def update_note(
         # Real-time event
         payload = {"id": str(note.id)}
         payload.update(updates)
-        
+
         await publish_event(
             room_id=str(note.project_id),
             event_type="note.updated",
@@ -126,7 +125,7 @@ async def delete_note(
     note_id: uuid.UUID,
     db: DBSession,
     user_id: CurrentUserID,
-) -> Any:
+) -> None:
     result = await db.execute(select(StickyNote).where(StickyNote.id == note_id))
     note = result.scalar_one_or_none()
     if not note:

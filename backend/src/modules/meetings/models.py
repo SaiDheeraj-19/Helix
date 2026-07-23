@@ -41,7 +41,7 @@ class Meeting(HelixBase, Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     room_slug: Mapped[str] = mapped_column(String(100), nullable=False)  # Unique Jitsi room name
     status: Mapped[str] = mapped_column(String(30), default=MeetingStatus.SCHEDULED, nullable=False)
-    
+
     # Timeline
     started_at: Mapped[str | None] = mapped_column(String(30), nullable=True)
     ended_at: Mapped[str | None] = mapped_column(String(30), nullable=True)
@@ -65,12 +65,12 @@ class MeetingAttendee(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     meeting_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("meetings.id", ondelete="CASCADE"), nullable=False)
-    
+
     # Internal user
     user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     # External guest
     external_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    
+
     invited_by_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
 
     # Relationships

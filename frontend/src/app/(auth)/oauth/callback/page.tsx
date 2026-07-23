@@ -23,7 +23,6 @@ function OAuthCallbackContent() {
   useEffect(() => {
     const error = searchParams.get("error");
     const accessToken = searchParams.get("access_token");
-    const refreshToken = searchParams.get("refresh_token");
     const userParam = searchParams.get("user");
 
     if (error) {
@@ -44,7 +43,7 @@ function OAuthCallbackContent() {
 
     try {
       const user = JSON.parse(decodeURIComponent(userParam));
-      setUser(user, accessToken, refreshToken ?? undefined);
+      setUser(user, accessToken);
       setStatus("success");
       setTimeout(() => router.push("/"), 800);
     } catch {

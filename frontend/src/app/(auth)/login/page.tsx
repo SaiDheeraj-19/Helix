@@ -37,7 +37,7 @@ export default function LoginPage() {
         "/api/v1/auth/login",
         data
       );
-      setUser(res.data.user, res.data.tokens.access_token, res.data.tokens.refresh_token);
+      setUser(res.data.user, res.data.tokens.access_token);
       toast.success(`Welcome back, ${res.data.user.display_name.split(" ")[0]}!`);
       router.push("/");
     } catch (err: any) {

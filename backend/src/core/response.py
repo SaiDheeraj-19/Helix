@@ -1,10 +1,11 @@
 """
 Helix Backend — Standard API Response Models
 Ensures consistent response envelope across all endpoints.
+# ruff: noqa: UP046, UP047
 """
 
 from datetime import UTC, datetime
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -36,7 +37,7 @@ class PaginationMeta(BaseModel):
         )
 
 
-class SuccessResponse(BaseModel, Generic[T]):
+class SuccessResponse[T](BaseModel):
     """Standard success response envelope."""
 
     success: bool = True
@@ -46,7 +47,7 @@ class SuccessResponse(BaseModel, Generic[T]):
     timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
 
 
-class PaginatedResponse(BaseModel, Generic[T]):
+class PaginatedResponse[T](BaseModel):
     """Paginated list response."""
 
     success: bool = True
@@ -72,12 +73,12 @@ class ErrorResponse(BaseModel):
     timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
 
 
-def ok(data: T, meta: dict[str, Any] | None = None) -> SuccessResponse[T]:
+def ok[T](data: T, meta: dict[str, Any] | None = None) -> SuccessResponse[T]:
     """Create a success response."""
     return SuccessResponse(data=data, meta=meta)
 
 
-def paginated(
+def paginated[T](
     data: list[T],
     page: int,
     per_page: int,

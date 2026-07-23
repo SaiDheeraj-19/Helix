@@ -131,26 +131,20 @@ apiClient.interceptors.response.use(
 );
 
 async function refreshAccessToken(): Promise<string> {
-  // Read the stored refresh token from the auth store
   const { useAuthStore } = await import("@/store/auth.store");
-  const refreshToken = useAuthStore.getState().refreshToken;
 
-  if (!refreshToken) {
-    throw new Error("No refresh token available");
-  }
-
-  const response = await axios.post<ApiResponse<{ access_token: string; refresh_token: string; token_type: string; expires_in: number }>>(
+  const response = await axios.post<ApiResponse<{ access_token: string; token_type: string; expires_in: number }>>(
     `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/auth/refresh`,
-    { refresh_token: refreshToken },
+    {},
     { withCredentials: true }
   );
 
   const data = response.data.data;
-  // Update the refresh token in store with the rotated one
+  
+  // Update the user session with the new access token
   useAuthStore.getState().setUser(
     useAuthStore.getState().user!,
     data.access_token,
-    data.refresh_token,
   );
 
   return data.access_token;

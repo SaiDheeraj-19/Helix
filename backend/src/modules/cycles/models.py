@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import datetime
-from enum import Enum as PyEnum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 from uuid import UUID as UUIDType
 
@@ -19,7 +19,7 @@ from src.infrastructure.database.base import Base
 from src.infrastructure.database.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 
-class CycleStatus(str, PyEnum):
+class CycleStatus(StrEnum):
     DRAFT = "draft"
     STARTED = "started"
     COMPLETED = "completed"

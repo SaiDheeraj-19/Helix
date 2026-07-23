@@ -7,7 +7,7 @@ FastAPI route handlers for authentication endpoints.
 
 import urllib.parse
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Cookie, HTTPException, Request, status
 from fastapi.responses import ORJSONResponse, RedirectResponse
 
 from src.core.config import settings
@@ -16,8 +16,6 @@ from src.core.response import ok_json
 from src.modules.auth.schemas import (
     ForgotPasswordRequest,
     LoginRequest,
-    MessageResponse,
-    RefreshTokenRequest,
     RegisterRequest,
     ResetPasswordRequest,
     VerifyEmailRequest,
@@ -96,8 +94,17 @@ async def oauth_google_callback(
         await db.commit()
 
         user_json = urllib.parse.quote(login_resp.user.model_dump_json(), safe="")
-        params = f"access_token={login_resp.tokens.access_token}" f"&refresh_token={login_resp.tokens.refresh_token}" f"&user={user_json}"
-        return RedirectResponse(url=f"{frontend_callback}?{params}")
+        params = f"access_token={login_resp.tokens.access_token}&user={user_json}"
+        response = RedirectResponse(url=f"{frontend_callback}?{params}")
+        response.set_cookie(
+            key="refresh_token",
+            value=login_resp.tokens.refresh_token,
+            httponly=True,
+            secure=settings.is_production,
+            samesite="lax",
+            max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+        )
+        return response
 
     except Exception as exc:
         import structlog
@@ -163,8 +170,17 @@ async def oauth_github_callback(
         await db.commit()
 
         user_json = urllib.parse.quote(login_resp.user.model_dump_json(), safe="")
-        params = f"access_token={login_resp.tokens.access_token}" f"&refresh_token={login_resp.tokens.refresh_token}" f"&user={user_json}"
-        return RedirectResponse(url=f"{frontend_callback}?{params}")
+        params = f"access_token={login_resp.tokens.access_token}&user={user_json}"
+        response = RedirectResponse(url=f"{frontend_callback}?{params}")
+        response.set_cookie(
+            key="refresh_token",
+            value=login_resp.tokens.refresh_token,
+            httponly=True,
+            secure=settings.is_production,
+            samesite="lax",
+            max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+        )
+        return response
 
     except Exception as exc:
         import structlog
@@ -195,10 +211,19 @@ async def register(
     """
     service = AuthService(db)
     result = await service.register(data, request_meta=_get_request_meta(request))
-    return ORJSONResponse(
+    response = ORJSONResponse(
         content=ok_json(result.model_dump(mode="json")),
         status_code=status.HTTP_201_CREATED,
     )
+    response.set_cookie(
+        key="refresh_token",
+        value=result.tokens.refresh_token,
+        httponly=True,
+        secure=settings.is_production,
+        samesite="lax",
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+    )
+    return response
 
 
 @router.post(
@@ -212,7 +237,16 @@ async def login(
 ) -> ORJSONResponse:
     service = AuthService(db)
     result = await service.login(data, request_meta=_get_request_meta(request))
-    return ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
+    response = ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
+    response.set_cookie(
+        key="refresh_token",
+        value=result.tokens.refresh_token,
+        httponly=True,
+        secure=settings.is_production,
+        samesite="lax",
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+    )
+    return response
 
 
 # ─────────────────────────────────────────────
@@ -225,14 +259,26 @@ async def login(
     summary="Refresh access token",
 )
 async def refresh_token(
-    data: RefreshTokenRequest,
     request: Request,
     db: DBSession,
+    refresh_token: str | None = Cookie(None),
 ) -> ORJSONResponse:
     """Rotate the refresh token and issue a new access token."""
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="No refresh token provided")
+
     service = AuthService(db)
-    result = await service.refresh(data.refresh_token, request_meta=_get_request_meta(request))
-    return ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
+    result = await service.refresh(refresh_token, request_meta=_get_request_meta(request))
+    response = ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
+    response.set_cookie(
+        key="refresh_token",
+        value=result.refresh_token,
+        httponly=True,
+        secure=settings.is_production,
+        samesite="lax",
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+    )
+    return response
 
 
 @router.post(
@@ -240,12 +286,16 @@ async def refresh_token(
     summary="Logout (revoke refresh token)",
 )
 async def logout(
-    data: RefreshTokenRequest,
     db: DBSession,
+    refresh_token: str | None = Cookie(None),
 ) -> ORJSONResponse:
-    service = AuthService(db)
-    result = await service.logout(data.refresh_token)
-    return ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
+    if refresh_token:
+        service = AuthService(db)
+        await service.logout(refresh_token)
+
+    response = ORJSONResponse(content=ok_json({"message": "Logged out successfully"}))
+    response.delete_cookie(key="refresh_token", httponly=True, secure=settings.is_production, samesite="lax")
+    return response
 
 
 @router.post(
@@ -258,7 +308,9 @@ async def logout_all(
 ) -> ORJSONResponse:
     service = AuthService(db)
     result = await service.logout_all_devices(current_user_id)
-    return ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
+    response = ORJSONResponse(content=ok_json(result.model_dump(mode="json")))
+    response.delete_cookie(key="refresh_token", httponly=True, secure=settings.is_production, samesite="lax")
+    return response
 
 
 # ─────────────────────────────────────────────
