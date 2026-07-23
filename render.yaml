@@ -5,7 +5,7 @@ services:
     plan: free
     region: ohio
     buildCommand: "cd backend && pip install poetry && poetry config virtualenvs.create false && poetry install --only main"
-    startCommand: "cd backend && uvicorn src.main:app --host 0.0.0.0 --port $PORT"
+    startCommand: "cd backend && alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
         sync: false
