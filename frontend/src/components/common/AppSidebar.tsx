@@ -28,7 +28,7 @@ const workspaceNavItems = [
   { label: "Cycles", href: "/cycles", icon: Repeat2 },
   { label: "Roadmap", href: "/roadmap", icon: Map },
   { label: "Meetings", href: "/meetings", icon: Video },
-  { label: "Sticky Notes", href: "/notes", icon: StickyNote },
+  { label: "Sticky Notes", href: "/sticky-notes", icon: StickyNote },
   { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Members", href: "/settings/workspace/members", icon: Users },
   { label: "AI Assistant", href: "/ai", icon: Bot },

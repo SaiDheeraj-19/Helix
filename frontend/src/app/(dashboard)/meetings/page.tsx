@@ -46,7 +46,7 @@ export default function MeetingsPage() {
             </div>
             <h3 className="text-lg font-medium text-[var(--color-foreground)]">No meetings scheduled</h3>
             <p className="text-sm text-[var(--color-foreground-muted)]">
-              You don't have any upcoming meetings. Meetings created inside your projects will appear here.
+              You don&apos;t have any upcoming meetings. Meetings created inside your projects will appear here.
             </p>
           </div>
         ) : (

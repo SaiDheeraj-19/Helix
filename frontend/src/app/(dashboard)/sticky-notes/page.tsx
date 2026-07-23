@@ -45,7 +45,7 @@ export default function StickyNotesPage() {
             </div>
             <h3 className="text-lg font-medium text-[var(--color-foreground)]">No notes found</h3>
             <p className="text-sm text-[var(--color-foreground-muted)]">
-              You haven't created any sticky notes yet. Create them inside your project whiteboards!
+              You haven&apos;t created any sticky notes yet. Create them inside your project whiteboards!
             </p>
           </div>
         ) : (

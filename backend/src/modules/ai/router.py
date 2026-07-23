@@ -74,7 +74,11 @@ async def _groq_stream(messages: list[dict[str, Any]], model: str) -> AsyncItera
     payload = {"model": model, "messages": messages, "stream": True}
     async with httpx.AsyncClient(timeout=60) as client:
         async with client.stream("POST", "https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload) as resp:
-            resp.raise_for_status()
+            try:
+                resp.raise_for_status()
+            except httpx.HTTPStatusError as exc:
+                await exc.response.aread()
+                raise Exception(f"Groq API error {exc.response.status_code}: {exc.response.text}")
             async for line in resp.aiter_lines():
                 if line.startswith("data: "):
                     raw = line[6:]

@@ -160,6 +160,7 @@ class Label(HelixBase, Base):
 
 from src.infrastructure.database.mixins import AuditMixin
 
+
 class StickyNote(HelixBase, AuditMixin, Base):
     """
     Collaborative developer sticky notes (whiteboard view).
