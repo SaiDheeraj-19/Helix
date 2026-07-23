@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import datetime
 from enum import Enum as PyEnum
+from typing import TYPE_CHECKING
 from uuid import UUID as UUIDType
 
 from sqlalchemy import Date, ForeignKey, String, Text, UniqueConstraint
@@ -10,6 +11,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.database.base import Base
 from src.infrastructure.database.mixins import TimestampMixin, UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from src.modules.issues.models import Issue
+    from src.modules.projects.models import Project
+    from src.modules.users.models import User
 
 
 class CycleStatus(str, PyEnum):

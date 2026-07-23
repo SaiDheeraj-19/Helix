@@ -1,5 +1,6 @@
 """Helix — Notifications Module: Models"""
 from enum import Enum as PyEnum
+from typing import TYPE_CHECKING
 from uuid import UUID as UUIDType
 
 from sqlalchemy import Boolean, ForeignKey, String, Text
@@ -7,6 +8,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.database.base import Base
 from src.infrastructure.database.mixins import TimestampMixin, UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from src.modules.users.models import User
 
 
 class NotificationType(str, PyEnum):

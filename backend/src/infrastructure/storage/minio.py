@@ -74,16 +74,20 @@ class StorageService:
     def __init__(self) -> None:
         self._client = get_s3_client()
 
+    @property
+    def client(self):
+        return self._client
+
     def upload_file(
         self,
         bucket: str,
         key: str,
         file_obj: BinaryIO,
         content_type: str = "application/octet-stream",
-        metadata: dict | None = None,
+        metadata: dict[str, object] | None = None,
     ) -> str:
         """Upload a file and return its public URL."""
-        extra_args = {"ContentType": content_type}
+        extra_args: dict[str, object] = {"ContentType": content_type}
         if metadata:
             extra_args["Metadata"] = {k: str(v) for k, v in metadata.items()}
 

@@ -4,6 +4,7 @@ Request ID injection, structured logging, CORS, rate limiting.
 """
 
 import time
+from collections.abc import Awaitable, Callable
 from uuid import uuid4
 
 import structlog
@@ -28,7 +29,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
     method, path, status code, and response time.
     """
 
-    async def dispatch(self, request: Request, call_next: any) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         request_id = request.headers.get("X-Request-ID") or str(uuid4())
         request.state.request_id = request_id
 
@@ -69,7 +70,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Adds security headers to all responses."""
 
-    async def dispatch(self, request: Request, call_next: any) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         response = await call_next(request)
 
         response.headers["X-Content-Type-Options"] = "nosniff"

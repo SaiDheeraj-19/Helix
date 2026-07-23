@@ -4,7 +4,7 @@ Provides reusable DI components: DB session, Redis, current user, RBAC.
 """
 
 from collections.abc import AsyncGenerator
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 import structlog
@@ -47,7 +47,7 @@ DBSession = Annotated[AsyncSession, Depends(get_db)]
 # =============================================================================
 
 
-async def get_redis() -> AsyncGenerator[any, None]:
+async def get_redis() -> AsyncGenerator[Any, None]:
     """Provide a Redis client per request."""
     client = await get_redis_client()
     try:
@@ -56,7 +56,7 @@ async def get_redis() -> AsyncGenerator[any, None]:
         pass  # Pool manages connections
 
 
-RedisClient = Annotated[any, Depends(get_redis)]
+RedisClient = Annotated[Any, Depends(get_redis)]
 
 # =============================================================================
 # Authentication

@@ -72,7 +72,7 @@ async def list_issues(
     service = IssueService(db)
     issues, total = await service.list_for_project(project_id, filters, page, per_page)
     return paginated(
-        items=[_serialize_issue(i) for i in issues],
+        data=[_serialize_issue(i) for i in issues],
         total=total,
         page=page,
         per_page=per_page,

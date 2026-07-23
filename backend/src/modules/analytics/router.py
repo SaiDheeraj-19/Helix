@@ -41,6 +41,8 @@ async def project_overview(project_id: UUID, current_user_id: CurrentUserID, db:
             by_group[state.group] = by_group.get(state.group, 0) + 1
         by_priority[issue.priority] = by_priority.get(issue.priority, 0) + 1
 
+    today = datetime.now(tz=UTC).date().isoformat()
+
     return ok({
         "total": len(issues),
         "by_state": [{"name": k, "count": v} for k, v in by_state.items()],
@@ -53,7 +55,7 @@ async def project_overview(project_id: UUID, current_user_id: CurrentUserID, db:
         "completed_count": by_group.get("completed", 0),
         "overdue_count": sum(
             1 for i in issues
-            if i.due_date and i.due_date < datetime.now(tz=UTC).date()
+            if i.due_date and i.due_date < today
             and str(states.get(str(i.state_id), IssueState()).group or "") not in ("completed", "cancelled")
         ),
     })
