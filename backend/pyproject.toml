@@ -66,6 +66,7 @@ sentry-sdk = { version = "^2.19.0", extras = ["fastapi"] }
 opentelemetry-api = "^1.28.0"
 opentelemetry-sdk = "^1.28.0"
 opentelemetry-instrumentation-fastapi = "^0.49b0"
+greenlet = "^3.5.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.0"

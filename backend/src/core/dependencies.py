@@ -107,6 +107,40 @@ async def get_optional_user_id(
 OptionalUserID = Annotated[UUID | None, Depends(get_optional_user_id)]
 
 # =============================================================================
+# WebSocket Authentication
+# =============================================================================
+
+
+async def get_current_user_ws(
+    websocket: __import__("fastapi").WebSocket,
+) -> UUID:
+    """
+    Extract and validate the JWT access token from the query parameters.
+    Used for authenticating WebSocket connections where Authorization headers
+    cannot be reliably sent by browser WebSocket clients.
+    """
+    token = websocket.query_params.get("token")
+    if not token:
+        raise UnauthorizedError("No authentication token provided in query string")
+
+    try:
+        payload = decode_token(token, expected_type=TokenType.ACCESS)
+    except JWTError as exc:
+        raise UnauthorizedError(str(exc)) from exc
+
+    user_id_str = payload.get("sub")
+    if not user_id_str:
+        raise UnauthorizedError("Token missing subject claim")
+
+    try:
+        return UUID(user_id_str)
+    except ValueError as exc:
+        raise UnauthorizedError("Token contains invalid user identifier") from exc
+
+
+CurrentUserIDWS = Annotated[UUID, Depends(get_current_user_ws)]
+
+# =============================================================================
 # Pagination
 # =============================================================================
 

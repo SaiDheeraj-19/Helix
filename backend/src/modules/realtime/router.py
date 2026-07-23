@@ -42,10 +42,11 @@ async def project_websocket(
             # Handle client-sent events (e.g. cursor position)
             event_type = data.get("type")
             if event_type == "cursor.moved":
-                await manager.broadcast(
-                    room_id,
-                    "cursor.moved",
-                    {**data.get("data", {}), "user_id": user_id},
+                from src.infrastructure.realtime.redis_pubsub import publish_event
+                await publish_event(
+                    room_id=room_id,
+                    event_type="cursor.moved",
+                    data={**data.get("data", {}), "user_id": user_id},
                     exclude_user=user_id,
                 )
     except WebSocketDisconnect:

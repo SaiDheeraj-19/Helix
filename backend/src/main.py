@@ -34,14 +34,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Initialize MinIO buckets
     from src.infrastructure.storage.minio import init_minio
-
     await init_minio()
+
+    # Start Realtime PubSub
+    from src.infrastructure.realtime.redis_pubsub import start_redis_listener, stop_redis_listener
+    start_redis_listener()
 
     logger.info("helix_ready")
     yield
 
     # Shutdown
     logger.info("helix_shutting_down")
+    await stop_redis_listener()
     await close_redis()
     logger.info("helix_stopped")
 

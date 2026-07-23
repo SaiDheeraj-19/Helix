@@ -112,6 +112,14 @@ class IssueService:
         )
         await self._db.flush()
 
+        from src.infrastructure.realtime.redis_pubsub import publish_event
+        await publish_event(
+            room_id=str(project_id),
+            event_type="issue.created",
+            data={"id": str(issue.id), "project_id": str(project_id)},
+            exclude_user=str(created_by)
+        )
+
         return await self.get_by_id(issue.id)
 
     async def get_by_id(self, issue_id: uuid.UUID) -> Issue:
@@ -240,9 +248,19 @@ class IssueService:
             self._db.add(activity)
 
         await self._db.flush()
+
+        from src.infrastructure.realtime.redis_pubsub import publish_event
+        await publish_event(
+            room_id=str(issue.project_id),
+            event_type="issue.updated",
+            data={"id": str(issue.id), "project_id": str(issue.project_id)},
+            exclude_user=str(updated_by)
+        )
+
         return await self.get_by_id(issue_id)
 
     async def delete(self, issue_id: uuid.UUID, deleted_by: uuid.UUID) -> None:
+        issue = await self.get_by_id(issue_id)
         await self._db.execute(
             update(Issue)
             .where(Issue.id == issue_id)
@@ -250,6 +268,14 @@ class IssueService:
                 deleted_at=datetime.now(UTC),
                 updated_by=deleted_by,
             )
+        )
+
+        from src.infrastructure.realtime.redis_pubsub import publish_event
+        await publish_event(
+            room_id=str(issue.project_id),
+            event_type="issue.deleted",
+            data={"id": str(issue.id), "project_id": str(issue.project_id)},
+            exclude_user=str(deleted_by)
         )
 
     # ─── Comments ──────────────────────────────────────────────────────────────

@@ -11,6 +11,7 @@ import dynamic from "next/dynamic";
 import { issuesApi, projectsApi } from "@/lib/api";
 import { cn, formatRelativeDate } from "@/lib/utils";
 import { useUIStore } from "@/store/ui.store";
+import { useProjectWebSocket } from "@/hooks/useWebSocket";
 import { IssuePriorityIcon } from "@/components/issues/IssuePriorityIcon";
 import { IssueStateIcon } from "@/components/issues/IssueStateIcon";
 import type { Issue, IssueState } from "@/types";
@@ -49,6 +50,9 @@ export default function IssuesPage() {
     enabled: !!projectIdentifier,
   });
   const project = projectData?.data;
+
+  // Initialize Realtime Sync Engine for this project
+  useProjectWebSocket(project?.id || null);
 
   // Fetch states
   const { data: statesData } = useQuery({
