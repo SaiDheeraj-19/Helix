@@ -41,6 +41,7 @@ const projectSchema = z.object({
   description: z.string().max(5000).optional(),
   color: z.string().default("#6366f1"),
   icon: z.string().optional(),
+  cover_image: z.string().optional(),
   network: z.enum(["public", "secret", "private"]).default("secret"),
 });
 
@@ -89,6 +90,37 @@ export default function ProjectsPage() {
 
   const watchedName = watch("name", "");
 
+const UNSPLASH_ACCESS_KEY = "LSMSW46oFpj3K0oLqt-M40l_j1Pn1K_Sr_abcg99pww";
+
+// ...
+export default function ProjectsPage() {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selectedColor, setSelectedColor] = useState("#6366f1");
+  const [coverUrl, setCoverUrl] = useState("https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1200&h=400");
+  const [isFetchingCover, setIsFetchingCover] = useState(false);
+  const queryClient = useQueryClient();
+
+  const fetchRandomCover = async () => {
+    try {
+      setIsFetchingCover(true);
+      const res = await fetch(`https://api.unsplash.com/photos/random?query=landscape,abstract,dark,nature&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCoverUrl(data.urls.regular);
+      } else {
+        toast.error("Unsplash API rate limit reached or error occurred.");
+      }
+    } catch (err) {
+      console.error("Failed to fetch Unsplash cover", err);
+    } finally {
+      setIsFetchingCover(false);
+    }
+  };
+
+// ... (skipping some unchanged lines in mind)
+// wait, I need to replace the entire block from line 133 to 186
+  
   // Auto-generate identifier from name
   const autoIdentifier = watchedName
     ? watchedName.replace(/[^A-Za-z0-9]/g, "").slice(0, 5).toUpperCase()
@@ -96,7 +128,7 @@ export default function ProjectsPage() {
 
   const createMutation = useMutation({
     mutationFn: (d: ProjectFormData) =>
-      projectsApi.create(WORKSPACE_SLUG, { ...d, color: selectedColor }),
+      projectsApi.create(WORKSPACE_SLUG, { ...d, color: selectedColor, cover_image: coverUrl }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects", WORKSPACE_SLUG] });
       toast.success("Project created successfully!");
@@ -129,18 +161,6 @@ export default function ProjectsPage() {
               </button>
             </Dialog.Trigger>
 
-const COVER_IMAGES = [
-  "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1200&h=400",
-  "https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&w=1200&h=400",
-  "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&h=400",
-  "https://images.unsplash.com/photo-1505322022379-7c3353ee6291?auto=format&fit=crop&w=1200&h=400",
-  "https://images.unsplash.com/photo-1531366936337-77cf5e08ce5a?auto=format&fit=crop&w=1200&h=400"
-];
-
-// ... (in component)
-  const [coverIndex, setCoverIndex] = useState(0);
-
-// ... (inside return)
             {/* Create Project Modal */}
             <Dialog.Portal>
               <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
@@ -152,15 +172,15 @@ const COVER_IMAGES = [
                   className="w-full max-w-[720px] rounded-xl border border-border/50 bg-[#151515] shadow-2xl overflow-hidden"
                 >
                   <form
-                    onSubmit={handleSubmit((d) => createMutation.mutate({ ...d, color: COVER_IMAGES[coverIndex] }))}
+                    onSubmit={handleSubmit((d) => createMutation.mutate({ ...d, cover_image: coverUrl }))}
                     className="flex flex-col"
                   >
                     {/* Cover Photo Area */}
                     <div className="relative h-[200px] w-full bg-muted overflow-hidden group">
                       <img 
-                        src={COVER_IMAGES[coverIndex]} 
+                        src={coverUrl} 
                         alt="Cover" 
-                        className="w-full h-full object-cover transition-opacity duration-300" 
+                        className={cn("w-full h-full object-cover transition-opacity duration-300", isFetchingCover && "opacity-50 blur-sm grayscale")} 
                       />
                       
                       <Dialog.Close asChild>
@@ -175,10 +195,12 @@ const COVER_IMAGES = [
 
                       <button
                         type="button"
-                        onClick={() => setCoverIndex((prev) => (prev + 1) % COVER_IMAGES.length)}
-                        className="absolute bottom-4 right-4 px-3 py-1.5 rounded-md bg-black/40 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
+                        onClick={fetchRandomCover}
+                        disabled={isFetchingCover}
+                        className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-md bg-black/40 text-white/90 text-xs font-medium border border-white/10 backdrop-blur-md hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100 disabled:opacity-100"
                       >
-                        Change cover
+                        {isFetchingCover ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                        {isFetchingCover ? "Searching..." : "Change cover"}
                       </button>
                     </div>
 
